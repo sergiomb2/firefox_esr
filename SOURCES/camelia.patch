@@ -1,0 +1,45 @@
+diff -up mozilla-release/netwerk/base/public/security-prefs.js.camelia mozilla-release/netwerk/base/public/security-prefs.js
+--- mozilla-release/netwerk/base/public/security-prefs.js.camelia	2013-09-11 01:15:20.000000000 +0200
++++ mozilla-release/netwerk/base/public/security-prefs.js	2013-10-10 14:25:45.524000007 +0200
+@@ -18,12 +18,6 @@ pref("security.ssl3.rsa_rc4_128_md5", tr
+ pref("security.ssl3.rsa_rc4_128_sha", true);
+ pref("security.ssl3.rsa_fips_des_ede3_sha", true);
+ pref("security.ssl3.rsa_des_ede3_sha", true);
+-pref("security.ssl3.dhe_rsa_camellia_256_sha", true);
+-pref("security.ssl3.dhe_dss_camellia_256_sha", true);
+-pref("security.ssl3.rsa_camellia_256_sha", true);
+-pref("security.ssl3.dhe_rsa_camellia_128_sha", true);
+-pref("security.ssl3.dhe_dss_camellia_128_sha", true);
+-pref("security.ssl3.rsa_camellia_128_sha", true);
+ pref("security.ssl3.dhe_rsa_aes_256_sha", true);
+ pref("security.ssl3.dhe_dss_aes_256_sha", true);
+ pref("security.ssl3.rsa_aes_256_sha", true);
+diff -up mozilla-release/security/manager/ssl/src/nsNSSComponent.cpp.camelia mozilla-release/security/manager/ssl/src/nsNSSComponent.cpp
+--- mozilla-release/security/manager/ssl/src/nsNSSComponent.cpp.camelia	2013-09-11 01:15:21.000000000 +0200
++++ mozilla-release/security/manager/ssl/src/nsNSSComponent.cpp	2013-10-10 14:27:04.388999975 +0200
+@@ -834,9 +834,6 @@ static CipherPref CipherPrefs[] = {
+  {"security.ssl3.rsa_fips_des_ede3_sha", SSL_RSA_FIPS_WITH_3DES_EDE_CBC_SHA}, // 168-bit Triple DES with RSA and a SHA1 MAC (FIPS)
+  {"security.ssl3.rsa_des_ede3_sha", SSL_RSA_WITH_3DES_EDE_CBC_SHA}, // 168-bit Triple DES with RSA and a SHA1 MAC
+  /* Extra SSL3/TLS cipher suites */
+- {"security.ssl3.dhe_rsa_camellia_256_sha", TLS_DHE_RSA_WITH_CAMELLIA_256_CBC_SHA}, // 256-bit Camellia encryption with RSA, DHE, and a SHA1 MAC
+- {"security.ssl3.dhe_dss_camellia_256_sha", TLS_DHE_DSS_WITH_CAMELLIA_256_CBC_SHA}, // 256-bit Camellia encryption with DSA, DHE, and a SHA1 MAC
+- {"security.ssl3.rsa_camellia_256_sha", TLS_RSA_WITH_CAMELLIA_256_CBC_SHA}, // 256-bit Camellia encryption with RSA and a SHA1 MAC
+  {"security.ssl3.dhe_rsa_aes_256_sha", TLS_DHE_RSA_WITH_AES_256_CBC_SHA}, // 256-bit AES encryption with RSA, DHE, and a SHA1 MAC
+  {"security.ssl3.dhe_dss_aes_256_sha", TLS_DHE_DSS_WITH_AES_256_CBC_SHA}, // 256-bit AES encryption with DSA, DHE, and a SHA1 MAC
+  {"security.ssl3.rsa_aes_256_sha", TLS_RSA_WITH_AES_256_CBC_SHA}, // 256-bit AES encryption with RSA and a SHA1 MAC
+@@ -858,15 +855,11 @@ static CipherPref CipherPrefs[] = {
+  {"security.ssl3.ecdh_rsa_aes_128_sha", TLS_ECDH_RSA_WITH_AES_128_CBC_SHA}, // 128-bit AES encryption with ECDH-RSA and a SHA1 MAC
+  {"security.ssl3.ecdh_rsa_des_ede3_sha", TLS_ECDH_RSA_WITH_3DES_EDE_CBC_SHA}, // 168-bit Triple DES with ECDH-RSA and a SHA1 MAC
+  {"security.ssl3.ecdh_rsa_rc4_128_sha", TLS_ECDH_RSA_WITH_RC4_128_SHA}, // 128-bit RC4 encryption with ECDH-RSA and a SHA1 MAC
+- {"security.ssl3.dhe_rsa_camellia_128_sha", TLS_DHE_RSA_WITH_CAMELLIA_128_CBC_SHA}, // 128-bit Camellia encryption with RSA, DHE, and a SHA1 MAC
+- {"security.ssl3.dhe_dss_camellia_128_sha", TLS_DHE_DSS_WITH_CAMELLIA_128_CBC_SHA}, // 128-bit Camellia encryption with DSA, DHE, and a SHA1 MAC
+- {"security.ssl3.rsa_camellia_128_sha", TLS_RSA_WITH_CAMELLIA_128_CBC_SHA}, // 128-bit Camellia encryption with RSA and a SHA1 MAC
+  {"security.ssl3.dhe_rsa_aes_128_sha", TLS_DHE_RSA_WITH_AES_128_CBC_SHA}, // 128-bit AES encryption with RSA, DHE, and a SHA1 MAC
+  {"security.ssl3.dhe_dss_aes_128_sha", TLS_DHE_DSS_WITH_AES_128_CBC_SHA}, // 128-bit AES encryption with DSA, DHE, and a SHA1 MAC
+  {"security.ssl3.rsa_aes_128_sha", TLS_RSA_WITH_AES_128_CBC_SHA}, // 128-bit AES encryption with RSA and a SHA1 MAC
+  {"security.ssl3.dhe_rsa_des_ede3_sha", SSL_DHE_RSA_WITH_3DES_EDE_CBC_SHA}, // 168-bit Triple DES with RSA, DHE, and a SHA1 MAC
+  {"security.ssl3.dhe_dss_des_ede3_sha", SSL_DHE_DSS_WITH_3DES_EDE_CBC_SHA}, // 168-bit Triple DES with DSA, DHE, and a SHA1 MAC
+- {"security.ssl3.rsa_seed_sha", TLS_RSA_WITH_SEED_CBC_SHA}, // SEED encryption with RSA and a SHA1 MAC
+  {nullptr, 0} /* end marker */
+ };
+ 
