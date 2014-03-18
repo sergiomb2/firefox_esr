@@ -1,5 +1,6 @@
 # Use system sqlite?
 %define system_sqlite           1
+%define system_ffi              0
 
 # Use system nss/nspr?
 %define system_nss              1
@@ -10,6 +11,9 @@
 %else
 %define enable_webm             0
 %endif
+
+# Use system cairo?
+%define system_cairo            0
 
 # Build as a debug package?
 %define debug_build             0
@@ -49,15 +53,15 @@
 
 Summary:        Mozilla Firefox Web browser
 Name:           firefox
-Version:        24.1.0
-Release:        3%{?prever}%{?dist}
+Version:        24.4.0
+Release:        1%{?prever}%{?dist}
 URL:            http://www.mozilla.org/projects/firefox/
 License:        MPLv1.1 or GPLv2+ or LGPLv2+
 Group:          Applications/Internet
 # From ftp://ftp.mozilla.org/pub/firefox/releases/%{version}%{?pretag}/source
 Source0:        firefox-%{version}%{?prever}%{?ext_version}.source.tar.bz2
 %if %{build_langpacks}
-Source1:        firefox-langpacks-%{version}%{?ext_version}-20131106.tar.bz2
+Source1:        firefox-langpacks-%{version}%{?ext_version}-20140318.tar.bz2
 %endif
 Source10:       firefox-mozconfig
 Source11:       firefox-mozconfig-branded
@@ -69,8 +73,6 @@ Source100:      find-external-requires
 
 # Build patches
 Patch0:         firefox-install-dir.patch
-Patch1:         camelia.patch
-Patch2:         mozilla-build.patch
 Patch3:         xulrunner-2.0-chromium-types.patch
 Patch4:         xulrunner-24.0-gcc47.patch
 Patch5:         xulrunner-24.0-jemalloc-ppc.patch
@@ -80,10 +82,12 @@ Patch7:         xulrunner-webrtc-secondarch.patch
 Patch11:        firefox-24.0-default.patch
 Patch12:        firefox-17.0-enable-addons.patch
 Patch13:        rhbz-966424.patch
+Patch14:        rhbz-1032770.patch
 
 # Upstream patches
 Patch100:       firefox-5.0-asciidel.patch
 Patch200:       firefox-duckduckgo.patch
+Patch300:       mozilla-906754.patch
 
 %if %{official_branding}
 # Required by Mozilla Corporation
@@ -120,7 +124,10 @@ Requires:       nspr >= %{nspr_version}
 Requires:       nss >= %{nss_version}
 %endif
 
+%if %{?system_cairo}
 BuildRequires:  cairo-devel >= %{cairo_version}
+%endif
+
 BuildRequires:  hunspell-devel
 Requires:       mozilla-filesystem
 %if %{?system_sqlite}
@@ -175,8 +182,6 @@ cd %{tarballdir}
 # Build patches
 # We have to keep original patch backup extension to go thru configure without problems with tests
 %patch0 -p1 -b .orig
-%patch1 -p1 -b .camelia
-%patch2 -p1 -b .mozilla-build
 %patch3 -p2 -b .chromium-types.patch
 %patch4 -p2 -b .gcc47.patch
 %patch5 -p2 -b .jemalloc-ppc.patch
@@ -186,10 +191,14 @@ cd %{tarballdir}
 %patch11 -p2 -b .default
 %patch12 -p1 -b .addons
 %patch13 -p1 -b .rhbz-966424
+%patch14 -p1 -b .rhbz-1032770
 
 # For branding specific patches.
 %patch100 -p1 -b .asciidel
 %patch200 -p1 -b .duckduckgo
+
+# Upstream patches
+%patch300 -p1 -b .906754
 
 %if %{official_branding}
 # Required by Mozilla Corporation
@@ -225,6 +234,16 @@ echo "ac_add_options --disable-webrtc" >> .mozconfig
 echo "ac_add_options --disable-ogg" >> .mozconfig
 %endif
 
+%if %{?system_cairo}
+echo "ac_add_options --enable-system-cairo" >> .mozconfig
+%else
+echo "ac_add_options --disable-system-cairo" >> .mozconfig
+%endif
+
+%if %{?system_ffi}
+echo "ac_add_options --enable-system-ffi" >> .mozconfig
+%endif
+
 %if %{?system_nss}
 echo "ac_add_options --with-system-nspr" >> .mozconfig
 echo "ac_add_options --with-system-nss" >> .mozconfig
@@ -249,6 +268,16 @@ echo "ac_add_options --enable-jemalloc" >> .mozconfig
 # s390(x) fails to start with jemalloc enabled
 %ifarch s390 s390x ppc ppc64
 echo "ac_add_options --disable-jemalloc" >> .mozconfig
+%endif
+
+# Debug build flags
+%if %{?debug_build}
+echo "ac_add_options --enable-debug" >> .mozconfig
+echo "ac_add_options --disable-optimize" >> .mozconfig
+echo "ac_add_options --enable-dtrace" >> .mozconfig
+%else
+echo "ac_add_options --disable-debug" >> .mozconfig
+echo "ac_add_options --enable-optimize" >> .mozconfig
 %endif
 
 #---------------------------------------------------------------------
@@ -477,6 +506,32 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 #---------------------------------------------------------------------
 
 %changelog
+* Tue Mar 18 2014 Jan Horak <jhorak@redhat.com> - 24.4.0-1
+- Update to 24.4.0 ESR
+
+* Thu Feb 27 2014 Martin Stransky <stransky@redhat.com> - 24.3.0-3
+- fixed rhbz#1054832 - Firefox does not support Camellia cipher
+
+* Mon Feb  3 2014 Jan Horak <jhorak@redhat.com> - 24.3.0-1
+- Update to 24.3.0 ESR
+
+* Fri Jan 24 2014 Daniel Mach <dmach@redhat.com> - 24.2.0-3
+- Mass rebuild 2014-01-24
+
+* Fri Dec 27 2013 Daniel Mach <dmach@redhat.com> - 24.2.0-2
+- Mass rebuild 2013-12-27
+
+* Mon Dec 9 2013 Martin Stransky <stransky@redhat.com> - 24.2.0-1
+- Update to 24.2.0 ESR
+
+* Mon Dec 2 2013 Martin Stransky <stransky@redhat.com> - 24.1.0-5
+- Fixed mozbz#938730 - avoid mix of memory allocators (crashes)
+  when using system sqlite
+
+* Tue Nov 26 2013 Martin Stransky <stransky@redhat.com> - 24.1.0-4
+- Fixed rhbz#1034541 - No translation being picked up 
+  from langpacks for firefox
+
 * Fri Nov 8 2013 Martin Stransky <stransky@redhat.com> - 24.1.0-3
 - Conflicts with old, xulrunner based firefox
 
