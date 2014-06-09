@@ -18,3 +18,7 @@ pref("browser.startup.homepage",            "data:text/plain,browser.startup.hom
 pref("toolkit.storage.synchronous",         0);
 pref("startup.homepage_override_url",       "http://www.redhat.com");
 pref("startup.homepage_welcome_url",        "http://www.redhat.com");
+pref("javascript.options.baselinejit.content", false);
+pref("javascript.options.baselinejit.chrome", false);
+pref("extensions.shownSelectionUI",         true);
+pref("layout.imagevisibility.enabled",      false);
