@@ -53,7 +53,7 @@
 
 Summary:        Mozilla Firefox Web browser
 Name:           firefox
-Version:        24.5.0
+Version:        24.6.0
 Release:        1%{?prever}%{?dist}
 URL:            http://www.mozilla.org/projects/firefox/
 License:        MPLv1.1 or GPLv2+ or LGPLv2+
@@ -61,7 +61,7 @@ Group:          Applications/Internet
 # From ftp://ftp.mozilla.org/pub/firefox/releases/%{version}%{?pretag}/source
 Source0:        firefox-%{version}%{?prever}%{?ext_version}.source.tar.bz2
 %if %{build_langpacks}
-Source1:        firefox-langpacks-%{version}%{?ext_version}-20140422.tar.bz2
+Source1:        firefox-langpacks-%{version}%{?ext_version}-20140604.tar.bz2
 %endif
 Source10:       firefox-mozconfig
 Source11:       firefox-mozconfig-branded
@@ -73,10 +73,8 @@ Source100:      find-external-requires
 
 # Build patches
 Patch0:         firefox-install-dir.patch
-Patch3:         xulrunner-2.0-chromium-types.patch
 Patch4:         xulrunner-24.0-gcc47.patch
 Patch5:         xulrunner-24.0-jemalloc-ppc.patch
-Patch7:         xulrunner-webrtc-secondarch.patch
 
 # RPM specific patches
 Patch11:        firefox-24.0-default.patch
@@ -182,10 +180,8 @@ cd %{tarballdir}
 # Build patches
 # We have to keep original patch backup extension to go thru configure without problems with tests
 %patch0 -p1 -b .orig
-%patch3 -p2 -b .chromium-types.patch
 %patch4 -p2 -b .gcc47.patch
 %patch5 -p2 -b .jemalloc-ppc.patch
-%patch7 -p2 -b .webrtc
 
 # RPM specific patches
 %patch11 -p2 -b .default
@@ -506,6 +502,12 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 #---------------------------------------------------------------------
 
 %changelog
+* Wed Jun  4 2014 Jan Horak <jhorak@redhat.com> - 24.6.0-1
+- Update to 24.6.0 ESR
+
+* Wed Apr 23 2014 Martin Stransky <stransky@redhat.com> - 24.5.0-2
+- Removed unused patches
+
 * Tue Apr 22 2014 Martin Stransky <stransky@redhat.com> - 24.5.0-1
 - Update to 24.5.0 ESR
 
