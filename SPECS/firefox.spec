@@ -502,6 +502,9 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 #---------------------------------------------------------------------
 
 %changelog
+* Sat Jun 21 2014 Johnny Hughes <johnny@centos.org> - 24.6.0-1.el7.centos
+- Roll in CentoS Branding
+
 * Wed Jun  4 2014 Jan Horak <jhorak@redhat.com> - 24.6.0-1
 - Update to 24.6.0 ESR
 
