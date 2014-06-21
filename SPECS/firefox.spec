@@ -65,7 +65,7 @@ Source1:        firefox-langpacks-%{version}%{?ext_version}-20140604.tar.bz2
 %endif
 Source10:       firefox-mozconfig
 Source11:       firefox-mozconfig-branded
-Source12:       firefox-redhat-default-prefs.js
+Source12:       firefox-centos-default-prefs.js
 Source20:       firefox.desktop
 Source21:       firefox.sh.in
 Source23:       firefox.1
