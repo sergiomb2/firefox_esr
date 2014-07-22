@@ -23,8 +23,8 @@
 
 # Minimal required versions
 %if %{?system_nss}
-%define nspr_version 4.10
-%define nss_version 3.15
+%define nspr_version 4.10.2
+%define nss_version 3.15.4
 %endif
 
 %define cairo_version 1.10.2
@@ -53,7 +53,7 @@
 
 Summary:        Mozilla Firefox Web browser
 Name:           firefox
-Version:        24.6.0
+Version:        24.7.0
 Release:        1%{?prever}%{?dist}
 URL:            http://www.mozilla.org/projects/firefox/
 License:        MPLv1.1 or GPLv2+ or LGPLv2+
@@ -61,11 +61,11 @@ Group:          Applications/Internet
 # From ftp://ftp.mozilla.org/pub/firefox/releases/%{version}%{?pretag}/source
 Source0:        firefox-%{version}%{?prever}%{?ext_version}.source.tar.bz2
 %if %{build_langpacks}
-Source1:        firefox-langpacks-%{version}%{?ext_version}-20140604.tar.bz2
+Source1:        firefox-langpacks-%{version}%{?ext_version}-20140717.tar.bz2
 %endif
 Source10:       firefox-mozconfig
 Source11:       firefox-mozconfig-branded
-Source12:       firefox-centos-default-prefs.js
+Source12:       firefox-redhat-default-prefs.js
 Source20:       firefox.desktop
 Source21:       firefox.sh.in
 Source23:       firefox.1
@@ -81,10 +81,13 @@ Patch11:        firefox-24.0-default.patch
 Patch12:        firefox-17.0-enable-addons.patch
 Patch13:        rhbz-966424.patch
 Patch14:        rhbz-1032770.patch
+Patch15:        firefox-system-nss-3.16.2.patch
 
-# Upstream patches
+# RHEL patches
 Patch100:       firefox-5.0-asciidel.patch
 Patch200:       firefox-duckduckgo.patch
+
+# Upstream patches
 Patch300:       mozilla-906754.patch
 
 %if %{official_branding}
@@ -188,8 +191,9 @@ cd %{tarballdir}
 %patch12 -p1 -b .addons
 %patch13 -p1 -b .rhbz-966424
 %patch14 -p1 -b .rhbz-1032770
+%patch15 -p2 -b .nss-3.16.2
 
-# For branding specific patches.
+# RHEL patches
 %patch100 -p1 -b .asciidel
 %patch200 -p1 -b .duckduckgo
 
@@ -502,8 +506,8 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 #---------------------------------------------------------------------
 
 %changelog
-* Sat Jun 21 2014 Johnny Hughes <johnny@centos.org> - 24.6.0-1.el7.centos
-- Roll in CentoS Branding
+* Thu Jul 17 2014 Jan Horak <jhorak@redhat.com> - 24.7.0-1
+- Update to 24.7.0 ESR
 
 * Wed Jun  4 2014 Jan Horak <jhorak@redhat.com> - 24.6.0-1
 - Update to 24.6.0 ESR
