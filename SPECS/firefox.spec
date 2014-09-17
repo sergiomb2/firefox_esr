@@ -1,12 +1,12 @@
 # Use system sqlite?
-%define system_sqlite           1
-%define system_ffi              0
+%define system_sqlite           0
+%define system_ffi              1
 
 # Use system nss/nspr?
 %define system_nss              1
 
-# Enable webm for i686/x86_64 only
-%ifarch %{ix86} x86_64
+# Enable webm
+%ifarch %{ix86} x86_64 ppc ppc64
 %define enable_webm             1
 %else
 %define enable_webm             0
@@ -23,12 +23,14 @@
 
 # Minimal required versions
 %if %{?system_nss}
-%define nspr_version 4.10.2
-%define nss_version 3.15.4
+%global nspr_version 4.10.6
+%global nss_version 3.16.2
 %endif
 
 %define cairo_version 1.10.2
 %define freetype_version 2.1.9
+%define ffi_version 3.0.9
+%global libvpx_version 1.3.0
 
 # Bookmark variables
 %define default_bookmarks_file  %{_datadir}/bookmarks/default-bookmarks.html
@@ -38,7 +40,7 @@
 %define langpackdir             %{mozappdir}/langpacks
 
 %if %{?system_sqlite}
-%define sqlite_version 3.6.22
+%define sqlite_version 3.8.4.2
 # The actual sqlite version (see #480989):
 %global sqlite_build_version %(pkg-config --silence-errors --modversion sqlite3 2>/dev/null || echo 65536)
 %endif
@@ -47,25 +49,25 @@
 %define build_langpacks         1
 
 %if %{official_branding}
-%define tarballdir  mozilla-esr24
+%define tarballdir  mozilla-esr31
 %define ext_version esr
 %endif
 
 Summary:        Mozilla Firefox Web browser
 Name:           firefox
-Version:        24.8.0
-Release:        1%{?prever}%{?dist}
+Version:        31.1.0
+Release:        6%{?prever}%{?dist}
 URL:            http://www.mozilla.org/projects/firefox/
 License:        MPLv1.1 or GPLv2+ or LGPLv2+
 Group:          Applications/Internet
 # From ftp://ftp.mozilla.org/pub/firefox/releases/%{version}%{?pretag}/source
 Source0:        firefox-%{version}%{?prever}%{?ext_version}.source.tar.bz2
 %if %{build_langpacks}
-Source1:        firefox-langpacks-%{version}%{?ext_version}-20140826.tar.bz2
+Source1:        firefox-langpacks-%{version}%{?ext_version}-20140828.tar.bz2
 %endif
 Source10:       firefox-mozconfig
 Source11:       firefox-mozconfig-branded
-Source12:       firefox-centos-default-prefs.js
+Source12:       firefox-redhat-default-prefs.js
 Source20:       firefox.desktop
 Source21:       firefox.sh.in
 Source23:       firefox.1
@@ -73,22 +75,18 @@ Source100:      find-external-requires
 
 # Build patches
 Patch0:         firefox-install-dir.patch
-Patch4:         xulrunner-24.0-gcc47.patch
 Patch5:         xulrunner-24.0-jemalloc-ppc.patch
 
 # RPM specific patches
-Patch11:        firefox-24.0-default.patch
-Patch12:        firefox-17.0-enable-addons.patch
+Patch11:        firefox-default.patch
+Patch12:        firefox-enable-addons.patch
 Patch13:        rhbz-966424.patch
-Patch14:        rhbz-1032770.patch
-Patch15:        firefox-system-nss-3.16.2.patch
-
-# RHEL patches
-Patch100:       firefox-5.0-asciidel.patch
-Patch200:       firefox-duckduckgo.patch
+Patch14:        remove-ogg.patch
+Patch15:        disable-webm.patch
+Patch16:        firefox-enable-plugins.patch
 
 # Upstream patches
-Patch300:       mozilla-906754.patch
+Patch200:       firefox-duckduckgo.patch
 
 %if %{official_branding}
 # Required by Mozilla Corporation
@@ -107,35 +105,32 @@ BuildRequires:  mesa-libGL-devel
 BuildRequires:  system-bookmarks
 Requires:       system-bookmarks
 Requires:       redhat-indexhtml
-
-%if %{?enable_webm}
-BuildRequires:  libvpx-devel >= 1.0.0
-Requires:       libvpx >= 1.0.0
-%endif
-
 %if %{?system_sqlite}
 BuildRequires:  sqlite-devel >= %{sqlite_version}
 Requires:       sqlite >= %{sqlite_build_version}
 %endif
-
 %if %{?system_nss}
 BuildRequires:  nspr-devel >= %{nspr_version}
 BuildRequires:  nss-devel >= %{nss_version}
 Requires:       nspr >= %{nspr_version}
 Requires:       nss >= %{nss_version}
 %endif
-
 %if %{?system_cairo}
 BuildRequires:  cairo-devel >= %{cairo_version}
 %endif
-
-BuildRequires:  hunspell-devel
-Requires:       mozilla-filesystem
 %if %{?system_sqlite}
 BuildRequires:  sqlite-devel >= %{sqlite_version}
 Requires:       sqlite >= %{sqlite_build_version}
 %endif
-
+%if %{?system_ffi}
+BuildRequires:  libffi-devel >= %{ffi_version}
+Requires:       libffi >= %{ffi_version}
+%endif
+%if %{?enable_webm}
+BuildRequires:  libvpx-devel >= %{libvpx_version}
+Requires:       libvpx >= %{libvpx_version}
+%endif
+BuildRequires:  hunspell-devel
 BuildRequires:  libpng-devel
 BuildRequires:  libjpeg-devel
 BuildRequires:  zip
@@ -156,7 +151,9 @@ BuildRequires:  alsa-lib-devel
 BuildRequires:  libnotify-devel
 BuildRequires:  autoconf213
 BuildRequires:  mesa-libGL-devel
+BuildRequires:  pulseaudio-libs-devel
 
+Requires:       mozilla-filesystem
 Requires:       liberation-fonts-common
 Requires:       liberation-sans-fonts
 
@@ -183,29 +180,28 @@ cd %{tarballdir}
 # Build patches
 # We have to keep original patch backup extension to go thru configure without problems with tests
 %patch0 -p1 -b .orig
-%patch4 -p2 -b .gcc47.patch
 %patch5 -p2 -b .jemalloc-ppc.patch
 
 # RPM specific patches
-%patch11 -p2 -b .default
+%patch11 -p1 -b .default
 %patch12 -p1 -b .addons
 %patch13 -p1 -b .rhbz-966424
-%patch14 -p1 -b .rhbz-1032770
-%patch15 -p2 -b .nss-3.16.2
+%patch14 -p1 -b .remove-ogg
+%if !%{?enable_webm}
+%patch15 -p1 -b .webm
+%endif
+%patch16 -p2 -b .plugins
 
-# RHEL patches
-%patch100 -p1 -b .asciidel
+# For branding specific patches.
 %patch200 -p1 -b .duckduckgo
 
 # Upstream patches
-%patch300 -p1 -b .906754
 
 %if %{official_branding}
 # Required by Mozilla Corporation
 
 %else
 # Not yet approved by Mozilla Corporation
-
 
 %endif
 
@@ -232,6 +228,7 @@ echo "ac_add_options --without-system-libvpx" >> .mozconfig
 echo "ac_add_options --disable-webm" >> .mozconfig
 echo "ac_add_options --disable-webrtc" >> .mozconfig
 echo "ac_add_options --disable-ogg" >> .mozconfig
+echo "ac_add_options --disable-opus" >> .mozconfig
 %endif
 
 %if %{?system_cairo}
@@ -259,7 +256,7 @@ echo "ac_add_options --disable-polyic" >> .mozconfig
 echo "ac_add_options --disable-tracejit" >> .mozconfig
 %endif
 
-# RHEL 6 mozconfig changes:
+# RHEL 7 mozconfig changes:
 echo "ac_add_options --enable-system-hunspell" >> .mozconfig
 echo "ac_add_options --enable-libnotify" >> .mozconfig
 echo "ac_add_options --enable-startup-notification" >> .mozconfig
@@ -497,6 +494,9 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 %{mozappdir}/plugin-container
 %{mozappdir}/dependentlibs.list
 %exclude %{mozappdir}/defaults/pref/channel-prefs.js
+%if !%{?system_nss}
+%{mozappdir}/*.chk
+%endif
 
 #we don't ship firefox-devel package
 %exclude %{_datadir}/idl/*
@@ -506,14 +506,31 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 #---------------------------------------------------------------------
 
 %changelog
-* Wed Sep 03 2014 CentOS Sources <bugs@centos.org> - 24.8.0-1.el7.centos
-- CentOS default prefs
+* Thu Sep 11 2014 Martin Stransky <stransky@redhat.com> - 31.1.0-6
+- Enable all NPAPI plugins by default to keep compatibility
+  with the FF24 line
 
-* Tue Aug 26 2014 Martin Stransky <stransky@redhat.com> - 24.8.0-1
-- Update to 24.8.0 ESR
+* Wed Sep 10 2014 Martin Stransky <stransky@redhat.com> - 31.1.0-5
+- Added workaround for rhbz#1134876
 
-* Thu Jul 17 2014 Jan Horak <jhorak@redhat.com> - 24.7.0-1
-- Update to 24.7.0 ESR
+* Mon Sep 8 2014 Martin Stransky <stransky@redhat.com> - 31.1.0-3
+- Disable mozilla::pkix (mozbz#1063315)
+- Enable image cache
+
+* Mon Sep 8 2014 Martin Stransky <stransky@redhat.com> - 31.1.0-2
+- A workaround for rhbz#1110291
+
+* Thu Aug 28 2014 Martin Stransky <stransky@redhat.com> - 31.1.0-1
+- Update to 31.1.0 ESR
+
+* Tue Aug 5 2014 Martin Stransky <stransky@redhat.com> - 31.0-3
+- Built with system libvpx/WebM
+
+* Mon Aug 4 2014 Martin Stransky <stransky@redhat.com> - 31.0-2
+- Built with system nss/nspr
+
+* Mon Jul 28 2014 Martin Stransky <stransky@redhat.com> - 31.0-1
+- Update to 31.0 ESR
 
 * Wed Jun  4 2014 Jan Horak <jhorak@redhat.com> - 24.6.0-1
 - Update to 24.6.0 ESR
@@ -684,4 +701,3 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 
 * Wed Jan 26 2011 Jan Horak <jhorak@redhat.com> - 3.6.14-2
 - Update to 3.6.14
-

@@ -1,6 +1,6 @@
-diff -up firefox-24.0/mozilla-esr24/browser/components/preferences/advanced.xul.default firefox-24.0/mozilla-esr24/browser/components/preferences/advanced.xul
---- firefox-24.0/mozilla-esr24/browser/components/preferences/advanced.xul.default	2013-09-11 05:22:18.000000000 +0200
-+++ firefox-24.0/mozilla-esr24/browser/components/preferences/advanced.xul	2013-10-31 12:51:28.597413904 +0100
+diff -up mozilla-aurora/browser/components/preferences/advanced.xul.default mozilla-aurora/browser/components/preferences/advanced.xul
+--- mozilla-aurora/browser/components/preferences/advanced.xul.default	2014-05-06 13:17:14.000000000 +0200
++++ mozilla-aurora/browser/components/preferences/advanced.xul	2014-05-06 14:07:22.972356178 +0200
 @@ -40,7 +40,7 @@
  #endif
        <preference id="layout.spellcheckDefault"        name="layout.spellcheckDefault"        type="int"/>
@@ -10,7 +10,7 @@ diff -up firefox-24.0/mozilla-esr24/browser/components/preferences/advanced.xul.
        <preference id="browser.shell.checkDefaultBrowser"
                    name="browser.shell.checkDefaultBrowser"
                    type="bool"/>
-@@ -72,7 +72,7 @@
+@@ -68,7 +68,7 @@
                    type="bool"/>
  
       <!-- Update tab -->
@@ -19,7 +19,7 @@ diff -up firefox-24.0/mozilla-esr24/browser/components/preferences/advanced.xul.
        <preference id="app.update.enabled"              name="app.update.enabled"              type="bool"/>
        <preference id="app.update.auto"                 name="app.update.auto"                 type="bool"/>
  #ifdef XP_WIN
-@@ -106,7 +106,7 @@
+@@ -102,7 +102,7 @@
                    type="bool"/>
      </preferences>
  
@@ -28,7 +28,7 @@ diff -up firefox-24.0/mozilla-esr24/browser/components/preferences/advanced.xul.
      <stringbundle id="bundleShell" src="chrome://browser/locale/shellservice.properties"/>
      <stringbundle id="bundleBrand" src="chrome://branding/locale/brand.properties"/>
  #endif
-@@ -174,7 +174,7 @@
+@@ -170,7 +170,7 @@
                        preference="layout.spellcheckDefault"/>
            </groupbox>
  
@@ -37,21 +37,10 @@ diff -up firefox-24.0/mozilla-esr24/browser/components/preferences/advanced.xul.
            <!-- System Defaults -->
            <groupbox id="systemDefaultsGroup" orient="vertical">
              <caption label="&systemDefaults.label;"/>
-diff -up firefox-24.0/mozilla-esr24/browser/components/shell/src/Makefile.in.default firefox-24.0/mozilla-esr24/browser/components/shell/src/Makefile.in
---- firefox-24.0/mozilla-esr24/browser/components/shell/src/Makefile.in.default	2013-10-31 12:49:11.279309914 +0100
-+++ firefox-24.0/mozilla-esr24/browser/components/shell/src/Makefile.in	2013-10-31 12:52:27.772465355 +0100
-@@ -13,7 +13,7 @@ include $(DEPTH)/config/autoconf.mk
- FORCE_STATIC_LIB = 1
- USE_STATIC_LIBS = 1
- 
--DISABLED_EXTRA_COMPONENTS = nsSetDefaultBrowser.js nsSetDefaultBrowser.manifest
-+#DISABLED_EXTRA_COMPONENTS = nsSetDefaultBrowser.js nsSetDefaultBrowser.manifest
- 
- include $(topsrcdir)/config/rules.mk
- 
-diff -up firefox-24.0/mozilla-esr24/browser/components/shell/src/nsGNOMEShellService.cpp.default firefox-24.0/mozilla-esr24/browser/components/shell/src/nsGNOMEShellService.cpp
---- firefox-24.0/mozilla-esr24/browser/components/shell/src/nsGNOMEShellService.cpp.default	2013-09-11 05:22:18.000000000 +0200
-+++ firefox-24.0/mozilla-esr24/browser/components/shell/src/nsGNOMEShellService.cpp	2013-10-31 12:56:17.450679146 +0100
+diff -up mozilla-aurora/browser/components/shell/src/Makefile.in.default mozilla-aurora/browser/components/shell/src/Makefile.in
+diff -up mozilla-aurora/browser/components/shell/src/nsGNOMEShellService.cpp.default mozilla-aurora/browser/components/shell/src/nsGNOMEShellService.cpp
+--- mozilla-aurora/browser/components/shell/src/nsGNOMEShellService.cpp.default	2014-05-06 13:17:14.000000000 +0200
++++ mozilla-aurora/browser/components/shell/src/nsGNOMEShellService.cpp	2014-05-06 14:07:22.973356181 +0200
 @@ -149,8 +149,8 @@ nsGNOMEShellService::GetAppPathFromLaunc
  bool
  nsGNOMEShellService::KeyMatchesAppName(const char *aKeyValue) const
@@ -60,9 +49,9 @@ diff -up firefox-24.0/mozilla-esr24/browser/components/shell/src/nsGNOMEShellSer
  
 -  gchar *commandPath;
    if (mUseLocaleFilenames) {
-     gchar *nativePath = g_filename_from_utf8(aKeyValue, -1, NULL, NULL, NULL);
-     if (!nativePath) {
-@@ -158,17 +158,13 @@ nsGNOMEShellService::KeyMatchesAppName(c
+     gchar *nativePath = g_filename_from_utf8(aKeyValue, -1,
+                                              nullptr, nullptr, nullptr);
+@@ -159,17 +159,13 @@ nsGNOMEShellService::KeyMatchesAppName(c
        return false;
      }
  
@@ -83,7 +72,7 @@ diff -up firefox-24.0/mozilla-esr24/browser/components/shell/src/nsGNOMEShellSer
    return matches;
  }
  
-@@ -253,16 +249,7 @@ nsGNOMEShellService::SetDefaultBrowser(b
+@@ -254,16 +250,7 @@ nsGNOMEShellService::SetDefaultBrowser(b
    nsCOMPtr<nsIGConfService> gconf = do_GetService(NS_GCONFSERVICE_CONTRACTID);
    nsCOMPtr<nsIGIOService> giovfs = do_GetService(NS_GIOSERVICE_CONTRACTID);
    if (gconf) {
@@ -101,9 +90,9 @@ diff -up firefox-24.0/mozilla-esr24/browser/components/shell/src/nsGNOMEShellSer
      appKeyValue.AppendLiteral(" %s");
  
      for (unsigned int i = 0; i < ArrayLength(appProtocols); ++i) {
-diff -up firefox-24.0/mozilla-esr24/browser/components/shell/src/nsGNOMEShellService.h.default firefox-24.0/mozilla-esr24/browser/components/shell/src/nsGNOMEShellService.h
---- firefox-24.0/mozilla-esr24/browser/components/shell/src/nsGNOMEShellService.h.default	2013-09-11 05:22:18.000000000 +0200
-+++ firefox-24.0/mozilla-esr24/browser/components/shell/src/nsGNOMEShellService.h	2013-10-31 12:49:11.280309915 +0100
+diff -up mozilla-aurora/browser/components/shell/src/nsGNOMEShellService.h.default mozilla-aurora/browser/components/shell/src/nsGNOMEShellService.h
+--- mozilla-aurora/browser/components/shell/src/nsGNOMEShellService.h.default	2014-05-06 13:17:14.000000000 +0200
++++ mozilla-aurora/browser/components/shell/src/nsGNOMEShellService.h	2014-05-06 14:07:22.973356181 +0200
 @@ -13,7 +13,7 @@
  class nsGNOMEShellService MOZ_FINAL : public nsIShellService
  {
