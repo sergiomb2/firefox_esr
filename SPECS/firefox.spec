@@ -67,7 +67,7 @@ Source1:        firefox-langpacks-%{version}%{?ext_version}-20140828.tar.bz2
 %endif
 Source10:       firefox-mozconfig
 Source11:       firefox-mozconfig-branded
-Source12:       firefox-redhat-default-prefs.js
+Source12:       firefox-centos-default-prefs.js
 Source20:       firefox.desktop
 Source21:       firefox.sh.in
 Source23:       firefox.1
@@ -506,6 +506,9 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 #---------------------------------------------------------------------
 
 %changelog
+* Wed Sep 17 2014 CentOS Sources <bugs@centos.org> - 31.1.0-6.el7.centos
+- CentOS default prefs
+
 * Thu Sep 11 2014 Martin Stransky <stransky@redhat.com> - 31.1.0-6
 - Enable all NPAPI plugins by default to keep compatibility
   with the FF24 line
