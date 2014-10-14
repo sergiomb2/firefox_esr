@@ -6,11 +6,7 @@
 %define system_nss              1
 
 # Enable webm
-%ifarch %{ix86} x86_64 ppc ppc64
 %define enable_webm             1
-%else
-%define enable_webm             0
-%endif
 
 # Use system cairo?
 %define system_cairo            0
@@ -53,21 +49,22 @@
 %define ext_version esr
 %endif
 
+
 Summary:        Mozilla Firefox Web browser
 Name:           firefox
-Version:        31.1.0
-Release:        6%{?prever}%{?dist}
+Version:        31.2.0
+Release:        3%{?prever}%{?dist}
 URL:            http://www.mozilla.org/projects/firefox/
 License:        MPLv1.1 or GPLv2+ or LGPLv2+
 Group:          Applications/Internet
 # From ftp://ftp.mozilla.org/pub/firefox/releases/%{version}%{?pretag}/source
 Source0:        firefox-%{version}%{?prever}%{?ext_version}.source.tar.bz2
 %if %{build_langpacks}
-Source1:        firefox-langpacks-%{version}%{?ext_version}-20140828.tar.bz2
+Source1:        firefox-langpacks-%{version}%{?ext_version}-20141013.tar.bz2
 %endif
 Source10:       firefox-mozconfig
 Source11:       firefox-mozconfig-branded
-Source12:       firefox-centos-default-prefs.js
+Source12:       firefox-redhat-default-prefs.js
 Source20:       firefox.desktop
 Source21:       firefox.sh.in
 Source23:       firefox.1
@@ -506,8 +503,12 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 #---------------------------------------------------------------------
 
 %changelog
-* Wed Sep 17 2014 CentOS Sources <bugs@centos.org> - 31.1.0-6.el7.centos
-- CentOS default prefs
+* Tue Oct  7 2014 Jan Horak <jhorak@redhat.com> - 31.2.0-3
+- Update to 31.2.0 ESR
+- Fix for mozbz#1042889
+
+* Wed Oct 1 2014 Martin Stransky <stransky@redhat.com> - 31.1.0-7
+- Enable WebM on all arches
 
 * Thu Sep 11 2014 Martin Stransky <stransky@redhat.com> - 31.1.0-6
 - Enable all NPAPI plugins by default to keep compatibility

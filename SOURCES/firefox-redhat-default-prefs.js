@@ -21,6 +21,7 @@ pref("startup.homepage_welcome_url",        "http://www.redhat.com");
 /* Workaround for rhbz#1134876 */
 pref("javascript.options.baselinejit",      false);
 pref("extensions.shownSelectionUI",         true);
+/* Workaround for rhbz#1110291 */
 pref("network.negotiate-auth.allow-insecure-ntlm-v1", true);
 /* Workaround for mozbz#1063315 */
 pref("security.use_mozillapkix_verification", false);
