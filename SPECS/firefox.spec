@@ -8,6 +8,9 @@
 # Enable webm
 %define enable_webm             1
 
+# Gstreamer 1.0 support
+%define enable_gstreamer        1
+
 # Use system cairo?
 %define system_cairo            0
 
@@ -20,7 +23,7 @@
 # Minimal required versions
 %if %{?system_nss}
 %global nspr_version 4.10.6
-%global nss_version 3.16.2
+%global nss_version 3.16.2.3
 %endif
 
 %define cairo_version 1.10.2
@@ -52,7 +55,7 @@
 
 Summary:        Mozilla Firefox Web browser
 Name:           firefox
-Version:        31.2.0
+Version:        31.3.0
 Release:        3%{?prever}%{?dist}
 URL:            http://www.mozilla.org/projects/firefox/
 License:        MPLv1.1 or GPLv2+ or LGPLv2+
@@ -60,19 +63,21 @@ Group:          Applications/Internet
 # From ftp://ftp.mozilla.org/pub/firefox/releases/%{version}%{?pretag}/source
 Source0:        firefox-%{version}%{?prever}%{?ext_version}.source.tar.bz2
 %if %{build_langpacks}
-Source1:        firefox-langpacks-%{version}%{?ext_version}-20141013.tar.bz2
+Source1:        firefox-langpacks-%{version}%{?ext_version}-20141126.tar.bz2
 %endif
 Source10:       firefox-mozconfig
 Source11:       firefox-mozconfig-branded
-Source12:       firefox-centos-default-prefs.js
+Source12:       firefox-redhat-default-prefs.js
 Source20:       firefox.desktop
 Source21:       firefox.sh.in
 Source23:       firefox.1
+Source24:       mozilla-api-key
 Source100:      find-external-requires
 
 # Build patches
 Patch0:         firefox-install-dir.patch
 Patch5:         xulrunner-24.0-jemalloc-ppc.patch
+Patch6:         webrtc-arch-cpu.patch
 
 # RPM specific patches
 Patch11:        firefox-default.patch
@@ -106,6 +111,7 @@ Requires:       redhat-indexhtml
 BuildRequires:  sqlite-devel >= %{sqlite_version}
 Requires:       sqlite >= %{sqlite_build_version}
 %endif
+
 %if %{?system_nss}
 BuildRequires:  nspr-devel >= %{nspr_version}
 BuildRequires:  nss-devel >= %{nss_version}
@@ -126,6 +132,10 @@ Requires:       libffi >= %{ffi_version}
 %if %{?enable_webm}
 BuildRequires:  libvpx-devel >= %{libvpx_version}
 Requires:       libvpx >= %{libvpx_version}
+%endif
+%if %{?enable_gstreamer}
+BuildRequires:  gstreamer1-devel
+BuildRequires:  gstreamer1-plugins-base-devel
 %endif
 BuildRequires:  hunspell-devel
 BuildRequires:  libpng-devel
@@ -178,6 +188,7 @@ cd %{tarballdir}
 # We have to keep original patch backup extension to go thru configure without problems with tests
 %patch0 -p1 -b .orig
 %patch5 -p2 -b .jemalloc-ppc.patch
+%patch6 -p1 -b .webrtc-arch-cpu
 
 # RPM specific patches
 %patch11 -p1 -b .default
@@ -208,6 +219,7 @@ cd %{tarballdir}
 %if %{official_branding}
 %{__cat} %{SOURCE11} >> .mozconfig
 %endif
+%{__cp} %{SOURCE24} mozilla-api-key
 
 %if %{?system_sqlite}
 echo "ac_add_options --enable-system-sqlite" >> .mozconfig
@@ -246,6 +258,12 @@ echo "ac_add_options --without-system-nspr" >> .mozconfig
 echo "ac_add_options --without-system-nss" >> .mozconfig
 %endif
 
+%if %{?enable_gstreamer}
+echo "ac_add_options --enable-gstreamer=1.0" >> .mozconfig
+%else
+echo "ac_add_options --disable-gstreamer" >> .mozconfig
+%endif
+
 %ifnarch %{ix86} x86_64
 echo "ac_add_options --disable-methodjit" >> .mozconfig
 echo "ac_add_options --disable-monoic" >> .mozconfig
@@ -258,11 +276,6 @@ echo "ac_add_options --enable-system-hunspell" >> .mozconfig
 echo "ac_add_options --enable-libnotify" >> .mozconfig
 echo "ac_add_options --enable-startup-notification" >> .mozconfig
 echo "ac_add_options --enable-jemalloc" >> .mozconfig
-
-# s390(x) fails to start with jemalloc enabled
-%ifarch s390 s390x ppc ppc64
-echo "ac_add_options --disable-jemalloc" >> .mozconfig
-%endif
 
 # Debug build flags
 %if %{?debug_build}
@@ -503,8 +516,21 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 #---------------------------------------------------------------------
 
 %changelog
-* Tue Oct 14 2014 CentOS Sources <bugs@centos.org> - 31.2.0-3.el7.centos
-- CentOS default prefs
+* Sat Nov 29 2014 Martin Stransky <stransky@redhat.com> - 31.3.0-3
+- Fixed geolocation key location
+
+* Fri Nov 28 2014 Martin Stransky <stransky@redhat.com> - 31.3.0-2
+- Disable exact rooting for JS
+
+* Wed Nov 26 2014 Martin Stransky <stransky@redhat.com> - 31.3.0-1
+- Update to 31.3.0 ESR Build 2
+- Fix for geolocation API (rhbz#1063739)
+
+* Thu Nov 6 2014 Martin Stransky <stransky@redhat.com> - 31.2.0-5
+- Enabled gstreamer-1 support (rhbz#1161077)
+
+* Mon Oct 27 2014 Yaakov Selkowitz <yselkowi@redhat.com> - 31.2.0-4
+- Fix webRTC for aarch64, ppc64le (rhbz#1148622)
 
 * Tue Oct  7 2014 Jan Horak <jhorak@redhat.com> - 31.2.0-3
 - Update to 31.2.0 ESR

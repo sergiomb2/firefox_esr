@@ -25,3 +25,4 @@ pref("extensions.shownSelectionUI",         true);
 pref("network.negotiate-auth.allow-insecure-ntlm-v1", true);
 /* Workaround for mozbz#1063315 */
 pref("security.use_mozillapkix_verification", false);
+pref("geo.wifi.uri", "https://location.services.mozilla.com/v1/geolocate?key=%MOZILLA_API_KEY%");
