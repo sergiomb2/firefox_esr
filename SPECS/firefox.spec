@@ -67,7 +67,7 @@ Source1:        firefox-langpacks-%{version}%{?ext_version}-20141126.tar.bz2
 %endif
 Source10:       firefox-mozconfig
 Source11:       firefox-mozconfig-branded
-Source12:       firefox-redhat-default-prefs.js
+Source12:       firefox-centos-default-prefs.js
 Source20:       firefox.desktop
 Source21:       firefox.sh.in
 Source23:       firefox.1
@@ -516,6 +516,9 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 #---------------------------------------------------------------------
 
 %changelog
+* Tue Dec 02 2014 CentOS Sources <bugs@centos.org> - 31.3.0-3.el7.centos
+- CentOS default prefs
+
 * Sat Nov 29 2014 Martin Stransky <stransky@redhat.com> - 31.3.0-3
 - Fixed geolocation key location
 
