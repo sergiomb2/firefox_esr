@@ -18,7 +18,11 @@ pref("browser.startup.homepage",            "data:text/plain,browser.startup.hom
 pref("toolkit.storage.synchronous",         0);
 pref("startup.homepage_override_url",       "http://www.centos.org");
 pref("startup.homepage_welcome_url",        "http://www.centos.org");
-pref("javascript.options.baselinejit.content", false);
-pref("javascript.options.baselinejit.chrome", false);
+/* Workaround for rhbz#1134876 */
+pref("javascript.options.baselinejit",      false);
 pref("extensions.shownSelectionUI",         true);
-pref("layout.imagevisibility.enabled",      false);
+/* Workaround for rhbz#1110291 */
+pref("network.negotiate-auth.allow-insecure-ntlm-v1", true);
+/* Workaround for mozbz#1063315 */
+pref("security.use_mozillapkix_verification", false);
+pref("geo.wifi.uri", "https://location.services.mozilla.com/v1/geolocate?key=%MOZILLA_API_KEY%");
