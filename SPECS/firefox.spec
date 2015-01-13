@@ -55,19 +55,19 @@
 
 Summary:        Mozilla Firefox Web browser
 Name:           firefox
-Version:        31.3.0
-Release:        3%{?prever}%{?dist}
+Version:        31.4.0
+Release:        1%{?prever}%{?dist}
 URL:            http://www.mozilla.org/projects/firefox/
 License:        MPLv1.1 or GPLv2+ or LGPLv2+
 Group:          Applications/Internet
 # From ftp://ftp.mozilla.org/pub/firefox/releases/%{version}%{?pretag}/source
 Source0:        firefox-%{version}%{?prever}%{?ext_version}.source.tar.bz2
 %if %{build_langpacks}
-Source1:        firefox-langpacks-%{version}%{?ext_version}-20141126.tar.bz2
+Source1:        firefox-langpacks-%{version}%{?ext_version}-20150106.tar.bz2
 %endif
 Source10:       firefox-mozconfig
 Source11:       firefox-mozconfig-branded
-Source12:       firefox-centos-default-prefs.js
+Source12:       firefox-redhat-default-prefs.js
 Source20:       firefox.desktop
 Source21:       firefox.sh.in
 Source23:       firefox.1
@@ -86,9 +86,12 @@ Patch13:        rhbz-966424.patch
 Patch14:        remove-ogg.patch
 Patch15:        disable-webm.patch
 Patch16:        firefox-enable-plugins.patch
+Patch17:        mozilla-ppc64le-js.patch
+Patch18:        rhbz-1014858.patch
 
 # Upstream patches
 Patch200:       firefox-duckduckgo.patch
+Patch201:       mozilla-1097550-dict-fix.patch
 
 %if %{official_branding}
 # Required by Mozilla Corporation
@@ -199,9 +202,14 @@ cd %{tarballdir}
 %patch15 -p1 -b .webm
 %endif
 %patch16 -p2 -b .plugins
+%ifarch ppc64 ppc64le
+%patch17 -p1 -b .ppc64le
+%endif
+%patch18 -p1 -b .rhbz-1014858
 
 # For branding specific patches.
 %patch200 -p1 -b .duckduckgo
+%patch201 -p2 -b .dict-fix
 
 # Upstream patches
 
@@ -281,7 +289,6 @@ echo "ac_add_options --enable-jemalloc" >> .mozconfig
 %if %{?debug_build}
 echo "ac_add_options --enable-debug" >> .mozconfig
 echo "ac_add_options --disable-optimize" >> .mozconfig
-echo "ac_add_options --enable-dtrace" >> .mozconfig
 %else
 echo "ac_add_options --disable-debug" >> .mozconfig
 echo "ac_add_options --enable-optimize" >> .mozconfig
@@ -516,8 +523,16 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 #---------------------------------------------------------------------
 
 %changelog
-* Tue Dec 02 2014 CentOS Sources <bugs@centos.org> - 31.3.0-3.el7.centos
-- CentOS default prefs
+* Tue Jan  6 2015 Jan Horak <jhorak@redhat.com> - 31.4.0-1
+- Update to 31.4.0 ESR
+
+* Mon Jan 5 2015 Martin Stransky <stransky@redhat.com> - 31.3.0-6
+- Fixed Bug 1140385 - [HP HPS 7.1 bug] assertion
+  "sys_page_size == 0" when starting firefox
+
+* Fri Dec 19 2014 Martin Stransky <stransky@redhat.com> - 31.3.0-5
+- Fixed problems with dictionary (mozbz#1097550)
+- JS JIT fixes for ppc64le
 
 * Sat Nov 29 2014 Martin Stransky <stransky@redhat.com> - 31.3.0-3
 - Fixed geolocation key location
