@@ -55,19 +55,19 @@
 
 Summary:        Mozilla Firefox Web browser
 Name:           firefox
-Version:        31.4.0
-Release:        1%{?prever}%{?dist}
+Version:        31.5.0
+Release:        2%{?prever}%{?dist}
 URL:            http://www.mozilla.org/projects/firefox/
 License:        MPLv1.1 or GPLv2+ or LGPLv2+
 Group:          Applications/Internet
 # From ftp://ftp.mozilla.org/pub/firefox/releases/%{version}%{?pretag}/source
 Source0:        firefox-%{version}%{?prever}%{?ext_version}.source.tar.bz2
 %if %{build_langpacks}
-Source1:        firefox-langpacks-%{version}%{?ext_version}-20150106.tar.bz2
+Source1:        firefox-langpacks-%{version}%{?ext_version}-20150218.tar.bz2
 %endif
 Source10:       firefox-mozconfig
 Source11:       firefox-mozconfig-branded
-Source12:       firefox-centos-default-prefs.js
+Source12:       firefox-redhat-default-prefs.js
 Source20:       firefox.desktop
 Source21:       firefox.sh.in
 Source23:       firefox.1
@@ -91,7 +91,7 @@ Patch18:        rhbz-1014858.patch
 
 # Upstream patches
 Patch200:       firefox-duckduckgo.patch
-Patch201:       mozilla-1097550-dict-fix.patch
+Patch201:       mozilla-1129859-dictfix2.patch
 
 %if %{official_branding}
 # Required by Mozilla Corporation
@@ -209,7 +209,7 @@ cd %{tarballdir}
 
 # For branding specific patches.
 %patch200 -p1 -b .duckduckgo
-%patch201 -p2 -b .dict-fix
+%patch201 -p1 -b .dict-fix
 
 # Upstream patches
 
@@ -316,6 +316,10 @@ MOZ_OPT_FLAGS=$(echo "$RPM_OPT_FLAGS -fpermissive" | %{__sed} -e 's/-Wall//')
 %if %{?debug_build}
 MOZ_OPT_FLAGS=$(echo "$MOZ_OPT_FLAGS" | %{__sed} -e 's/-O2//')
 %endif
+# -Werror=format-security causes build failures when -Wno-format is explicitly given
+# for some sources
+MOZ_OPT_FLAGS="$MOZ_OPT_FLAGS -Wformat-security -Wformat -Werror=format-security"
+
 %ifarch s390
 MOZ_OPT_FLAGS=$(echo "$RPM_OPT_FLAGS" | %{__sed} -e 's/-g/-g1/')
 %endif
@@ -523,8 +527,8 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 #---------------------------------------------------------------------
 
 %changelog
-* Tue Jan 13 2015 CentOS Sources <bugs@centos.org> - 31.4.0-1.el7.centos
-- CentOS default prefs
+* Wed Feb 18 2015 Martin Stransky <stransky@redhat.com> - 31.5.0-2
+- Update to 31.5.0 ESR Build 2
 
 * Tue Jan  6 2015 Jan Horak <jhorak@redhat.com> - 31.4.0-1
 - Update to 31.4.0 ESR
