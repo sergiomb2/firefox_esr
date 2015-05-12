@@ -1,0 +1,11 @@
+diff -up mozilla-aurora/media/libstagefright/moz.build.no-format mozilla-aurora/media/libstagefright/moz.build
+--- mozilla-aurora/media/libstagefright/moz.build.no-format	2015-03-16 13:39:35.861598410 +0100
++++ mozilla-aurora/media/libstagefright/moz.build	2015-03-16 13:39:39.710557344 +0100
+@@ -141,7 +141,6 @@ elif CONFIG['GNU_CXX']:
+         '-Wno-sign-compare'
+     ]
+     CXXFLAGS += [
+-        '-Wno-format',
+         '-Wno-multichar',
+         '-Wno-sign-compare',
+         '-Wno-unused',

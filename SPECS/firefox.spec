@@ -5,9 +5,6 @@
 # Use system nss/nspr?
 %define system_nss              1
 
-# Enable webm
-%define enable_webm             1
-
 # Gstreamer 1.0 support
 %define enable_gstreamer        1
 
@@ -22,14 +19,15 @@
 
 # Minimal required versions
 %if %{?system_nss}
-%global nspr_version 4.10.6
-%global nss_version 3.16.2.3
+%global nspr_version 4.10.8
+%global nss_version 3.18.0
 %endif
 
 %define cairo_version 1.10.2
 %define freetype_version 2.1.9
 %define ffi_version 3.0.9
 %global libvpx_version 1.3.0
+%define _default_patch_fuzz 2
 
 # Bookmark variables
 %define default_bookmarks_file  %{_datadir}/bookmarks/default-bookmarks.html
@@ -48,26 +46,26 @@
 %define build_langpacks         1
 
 %if %{official_branding}
-%define tarballdir  mozilla-esr31
+%define tarballdir  mozilla-esr38
 %define ext_version esr
 %endif
 
 
 Summary:        Mozilla Firefox Web browser
 Name:           firefox
-Version:        31.6.0
-Release:        2%{?prever}%{?dist}
+Version:        38.0
+Release:        3%{?prever}%{?dist}
 URL:            http://www.mozilla.org/projects/firefox/
 License:        MPLv1.1 or GPLv2+ or LGPLv2+
 Group:          Applications/Internet
 # From ftp://ftp.mozilla.org/pub/firefox/releases/%{version}%{?pretag}/source
 Source0:        firefox-%{version}%{?prever}%{?ext_version}.source.tar.bz2
 %if %{build_langpacks}
-Source1:        firefox-langpacks-%{version}%{?ext_version}-20150325.tar.bz2
+Source1:        firefox-langpacks-%{version}%{?ext_version}-20150506.tar.bz2
 %endif
 Source10:       firefox-mozconfig
 Source11:       firefox-mozconfig-branded
-Source12:       firefox-centos-default-prefs.js
+Source12:       firefox-redhat-default-prefs.js
 Source20:       firefox.desktop
 Source21:       firefox.sh.in
 Source23:       firefox.1
@@ -78,20 +76,26 @@ Source100:      find-external-requires
 Patch0:         firefox-install-dir.patch
 Patch5:         xulrunner-24.0-jemalloc-ppc.patch
 Patch6:         webrtc-arch-cpu.patch
+Patch7:         build-no-format.patch
+Patch8:         firefox-ppc64le.patch
+Patch9:         firefox-debug.patch
+Patch10:        firefox-nss-3.18.0.patch
+Patch11:        build-nspr-prbool.patch
 
 # RPM specific patches
-Patch11:        firefox-default.patch
-Patch12:        firefox-enable-addons.patch
-Patch13:        rhbz-966424.patch
-Patch14:        remove-ogg.patch
-Patch15:        disable-webm.patch
-Patch16:        firefox-enable-plugins.patch
-Patch17:        mozilla-ppc64le-js.patch
-Patch18:        rhbz-1014858.patch
+Patch101:        firefox-default.patch
+Patch102:        firefox-enable-addons.patch
+Patch103:        rhbz-966424.patch
+Patch106:        firefox-enable-plugins.patch
+Patch108:        rhbz-1014858.patch
+# Fix Skia Neon stuff on AArch64
+Patch109:        aarch64-fix-skia.patch
+
 
 # Upstream patches
 Patch200:       firefox-duckduckgo.patch
-Patch201:       mozilla-1129859-dictfix2.patch
+Patch201:       mozilla-1005535.patch
+Patch202:       mozilla-1152515.patch
 
 %if %{official_branding}
 # Required by Mozilla Corporation
@@ -132,10 +136,8 @@ Requires:       sqlite >= %{sqlite_build_version}
 BuildRequires:  libffi-devel >= %{ffi_version}
 Requires:       libffi >= %{ffi_version}
 %endif
-%if %{?enable_webm}
 BuildRequires:  libvpx-devel >= %{libvpx_version}
 Requires:       libvpx >= %{libvpx_version}
-%endif
 %if %{?enable_gstreamer}
 BuildRequires:  gstreamer1-devel
 BuildRequires:  gstreamer1-plugins-base-devel
@@ -174,6 +176,12 @@ Conflicts:      firefox < 24.1.0
 Provides:       webclient
 
 
+# BUILDEQUIRES from yelp
+BuildRequires:  bison
+BuildRequires:  byacc
+BuildRequires:  xmlto
+BuildRequires:  gettext-devel
+
 %define _use_internal_dependency_generator 0
 %define __find_requires %{SOURCE100}
 
@@ -187,29 +195,34 @@ compliance, performance and portability.
 %setup -q -c
 cd %{tarballdir}
 
+# test if they exists
 # Build patches
 # We have to keep original patch backup extension to go thru configure without problems with tests
 %patch0 -p1 -b .orig
 %patch5 -p2 -b .jemalloc-ppc.patch
 %patch6 -p1 -b .webrtc-arch-cpu
+%patch7 -p1 -b .no-format
+%patch8 -p2 -b .ppc64le
+%if %{?debug_build}
+%ifnarch %{ix86} x86_64
+%patch9 -p1 -b .debug
+%endif
+%endif
+%patch10 -p1 -b .nss-3.18.0
+%patch11 -p1 -b .nspr-prbool
 
 # RPM specific patches
-%patch11 -p1 -b .default
-%patch12 -p1 -b .addons
-%patch13 -p1 -b .rhbz-966424
-%patch14 -p1 -b .remove-ogg
-%if !%{?enable_webm}
-%patch15 -p1 -b .webm
-%endif
-%patch16 -p2 -b .plugins
-%ifarch ppc64 ppc64le
-%patch17 -p1 -b .ppc64le
-%endif
-%patch18 -p1 -b .rhbz-1014858
+%patch101 -p1 -b .default
+%patch102 -p1 -b .addons
+%patch103 -p1 -b .rhbz-966424
+%patch106 -p2 -b .plugins
+%patch108 -p1 -b .rhbz-1014858
+%patch109 -p1 -b .aarch64
 
 # For branding specific patches.
 %patch200 -p1 -b .duckduckgo
-%patch201 -p1 -b .dict-fix
+%patch201 -p1 -b .mozbz-1005535
+%patch202 -p1 -b .mozbz-1152515
 
 # Upstream patches
 
@@ -235,18 +248,7 @@ echo "ac_add_options --enable-system-sqlite" >> .mozconfig
 echo "ac_add_options --disable-system-sqlite" >> .mozconfig
 %endif
 
-%if %{?enable_webm}
 echo "ac_add_options --with-system-libvpx" >> .mozconfig
-echo "ac_add_options --enable-webm" >> .mozconfig
-echo "ac_add_options --enable-webrtc" >> .mozconfig
-echo "ac_add_options --enable-ogg" >> .mozconfig
-%else
-echo "ac_add_options --without-system-libvpx" >> .mozconfig
-echo "ac_add_options --disable-webm" >> .mozconfig
-echo "ac_add_options --disable-webrtc" >> .mozconfig
-echo "ac_add_options --disable-ogg" >> .mozconfig
-echo "ac_add_options --disable-opus" >> .mozconfig
-%endif
 
 %if %{?system_cairo}
 echo "ac_add_options --enable-system-cairo" >> .mozconfig
@@ -327,7 +329,7 @@ MOZ_OPT_FLAGS=$(echo "$RPM_OPT_FLAGS" | %{__sed} -e 's/-g/-g1/')
 MOZ_LINK_FLAGS="-Wl,--no-keep-memory -Wl,--reduce-memory-overheads"
 %endif
 
-export CFLAGS=$MOZ_OPT_FLAGS
+export CFLAGS=$(echo "$MOZ_OPT_FLAGS" | %{__sed} -e 's/-fpermissive//')
 export CXXFLAGS=$MOZ_OPT_FLAGS
 export LDFLAGS=$MOZ_LINK_FLAGS
 
@@ -509,12 +511,13 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 %{mozappdir}/components/*.manifest
 %{mozappdir}/dictionaries
 %{mozappdir}/*.so
-%{mozappdir}/mozilla-xremote-client
+#%{mozappdir}/mozilla-xremote-client FIXME
 %{mozappdir}/omni.ja
 %{mozappdir}/platform.ini
 %{mozappdir}/plugin-container
 %{mozappdir}/dependentlibs.list
 %exclude %{mozappdir}/defaults/pref/channel-prefs.js
+%{mozappdir}/gmp-clearkey
 %if !%{?system_nss}
 %{mozappdir}/*.chk
 %endif
@@ -527,23 +530,39 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 #---------------------------------------------------------------------
 
 %changelog
-* Tue Mar 31 2015 CentOS Sources <bugs@centos.org> - 31.6.0-2.el7.centos
-- CentOS default prefs
+* Thu May  7 2015 Martin Stransky <stransky@redhat.com> - 38.0-3
+- Enabled system nss
+- Removed unused patches
 
-* Thu Mar 26 2015 Martin Stransky <stransky@redhat.com> - 31.6.0-2
-- Update to 31.6.0 ESR Build 2
+* Mon May  4 2015 Jan Horak - 38.0-2
+- Update to 38.0 ESR
 
-* Wed Mar 25 2015 Jan Horak <jhorak@redhat.com> - 31.6.0-1
-- Update to 31.6.0 ESR
+* Mon Apr 27 2015 Martin Stransky <stransky@redhat.com> - 38.0b8-0.11
+- Update to 38.0 Beta 8
 
-* Sat Mar 21 2015 Martin Stransky <stransky@redhat.com> - 31.5.3-3
-- Update to 31.5.3 ESR
+* Wed Apr 22 2015 Martin Stransky <stransky@redhat.com> - 38.0b6-0.10
+- Added patch for mozbz#1152515
 
-* Fri Mar 20 2015 Martin Stransky <stransky@redhat.com> - 31.5.2-1
-- Update to 31.5.2 ESR
+* Tue Apr 21 2015 Martin Stransky <stransky@redhat.com> - 38.0b6-0.9
+- Update to 38.0 Beta 6
 
-* Fri Mar 20 2015 Jan Horak <jhorak@redhat.com> - 31.5.1-1
-- Update to 31.5.1 ESR
+* Mon Apr 20 2015 Martin Stransky <stransky@redhat.com> - 38.0b5-0.8
+- Update to 38.0 Beta 5
+
+* Fri Apr 10 2015 Martin Stransky <stransky@redhat.com> - 38.0b3-0.7
+- Update to 38.0 Beta 3
+
+* Fri Apr 10 2015 Martin Stransky <stransky@redhat.com> - 38.0b1-0.6
+- Added patch for mozbz#1152391
+
+* Thu Apr  9 2015 Marcin Juszkiewicz <mjuszkiewicz@redhat.com> - 38.0b1-0.5
+- Fix build on AArch64 (based on upstream skia changes)
+
+* Tue Apr 7 2015 Martin Stransky <stransky@redhat.com> - 38.0b1-0.4
+- Enabled debug build
+
+* Wed Apr  1 2015 Jan Horak <jhorak@redhat.com> - 38.0b1-1
+- Update to 38.0b1
 
 * Wed Feb 18 2015 Martin Stransky <stransky@redhat.com> - 31.5.0-2
 - Update to 31.5.0 ESR Build 2
