@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # The contents of this file are subject to the Netscape Public
 # License Version 1.1 (the "License"); you may not use this file
@@ -168,9 +168,9 @@ FEDORA_LANGPACK_CONFIG="$MOZ_EXTENSIONS_PROFILE_DIR/.fedora-langpack-install"
 # MOZ_DISABLE_LANGPACKS disables language packs completely
 MOZILLA_DOWN=0
 if ! [ $MOZ_DISABLE_LANGPACKS ] || [ $MOZ_DISABLE_LANGPACKS -eq 0 ]; then
-    if [ -x $MOZ_DIST_BIN/mozilla-xremote-client ]; then
+    if [ -x $MOZ_DIST_BIN/$MOZ_FIREFOX_FILE ]; then
         # Is firefox running?
-        $MOZ_DIST_BIN/mozilla-xremote-client -a firefox 'ping()' > /dev/null 2>&1
+        $MOZ_DIST_BIN/$MOZ_FIREFOX_FILE -remote 'ping()' > /dev/null 2>&1
         MOZILLA_DOWN=$?
     fi
 fi
@@ -185,7 +185,6 @@ if [ $MOZILLA_DOWN -ne 0 ]; then
         rm `cat $FEDORA_LANGPACK_CONFIG` > /dev/null 2>&1
         rm $FEDORA_LANGPACK_CONFIG > /dev/null 2>&1
         # remove all empty langpacks dirs while they block installation of langpacks
-        # (rhbz#1067343)
         rmdir $MOZ_EXTENSIONS_PROFILE_DIR/langpack* > /dev/null 2>&1
     fi
 
@@ -194,8 +193,7 @@ if [ $MOZILLA_DOWN -ne 0 ]; then
     CURRENT_LOCALE=${CURRENT_LOCALE:-$LC_MESSAGES}
     CURRENT_LOCALE=${CURRENT_LOCALE:-$LANG}
 
-    # Try without a local variant first, then with a local variant
-    # So that pt-BR doesn't try to use pt for example
+    # Try with a local variant first, then without a local variant
     SHORTMOZLOCALE=`echo $CURRENT_LOCALE | sed "s|_\([^.]*\).*||g"`
     MOZLOCALE=`echo $CURRENT_LOCALE | sed "s|_\([^.]*\).*|-\1|g"`
 
@@ -204,6 +202,11 @@ if [ $MOZILLA_DOWN -ne 0 ]; then
         local langpack=langpack-${language}@firefox.mozilla.org.xpi
         if [ -f $MOZ_LANGPACKS_DIR/$langpack ]; then
             rm -rf $MOZ_EXTENSIONS_PROFILE_DIR/$langpack
+            # If the target file is a symlink (the fallback langpack), 
+            # install the original file instead of the fallback one
+            if [ -h $MOZ_LANGPACKS_DIR/$langpack ]; then
+                langpack=`readlink $MOZ_LANGPACKS_DIR/$langpack`
+            fi
             ln -s $MOZ_LANGPACKS_DIR/$langpack \
                   $MOZ_EXTENSIONS_PROFILE_DIR/$langpack
             echo $MOZ_EXTENSIONS_PROFILE_DIR/$langpack > $FEDORA_LANGPACK_CONFIG
@@ -212,10 +215,10 @@ if [ $MOZILLA_DOWN -ne 0 ]; then
         return 1
     }
 
-    create_langpack_link $SHORTMOZLOCALE || create_langpack_link $MOZLOCALE || true
+    create_langpack_link $MOZLOCALE || create_langpack_link $SHORTMOZLOCALE || true
 fi
 
-# BEAST fix (rhbz#838879)
+# BEAST fix (rhbz#1005611)
 NSS_SSL_CBC_RANDOM_IV=${NSS_SSL_CBC_RANDOM_IV-1}
 export NSS_SSL_CBC_RANDOM_IV
 
