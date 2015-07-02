@@ -1,0 +1,12 @@
+diff -up mozilla-esr38/configure.in.nss-3.19.0 mozilla-esr38/configure.in
+--- mozilla-esr38/configure.in.nss-3.19.0	2015-06-25 10:36:40.205019840 +0200
++++ mozilla-esr38/configure.in	2015-06-25 11:58:46.859155245 +0200
+@@ -3627,7 +3627,7 @@ MOZ_ARG_WITH_BOOL(system-nss,
+     _USE_SYSTEM_NSS=1 )
+ 
+ if test -n "$_USE_SYSTEM_NSS"; then
+-    AM_PATH_NSS(3.19.2, [MOZ_NATIVE_NSS=1], [AC_MSG_ERROR([you don't have NSS installed or your version is too old])])
++    AM_PATH_NSS(3.19.1, [MOZ_NATIVE_NSS=1], [AC_MSG_ERROR([you don't have NSS installed or your version is too old])])
+ fi
+ 
+ if test -n "$MOZ_NATIVE_NSS"; then
