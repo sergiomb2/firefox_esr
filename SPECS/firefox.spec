@@ -53,7 +53,7 @@
 
 Summary:        Mozilla Firefox Web browser
 Name:           firefox
-Version:        38.1.0
+Version:        38.1.1
 Release:        1%{?prever}%{?dist}
 URL:            http://www.mozilla.org/projects/firefox/
 License:        MPLv1.1 or GPLv2+ or LGPLv2+
@@ -61,11 +61,11 @@ Group:          Applications/Internet
 # From ftp://ftp.mozilla.org/pub/firefox/releases/%{version}%{?pretag}/source
 Source0:        firefox-%{version}%{?prever}%{?ext_version}.source.tar.bz2
 %if %{build_langpacks}
-Source1:        firefox-langpacks-%{version}%{?ext_version}-20150625.tar.bz2
+Source1:        firefox-langpacks-%{version}%{?ext_version}-20150806.tar.bz2
 %endif
 Source10:       firefox-mozconfig
 Source11:       firefox-mozconfig-branded
-Source12:       firefox-centos-default-prefs.js
+Source12:       firefox-redhat-default-prefs.js
 Source20:       firefox.desktop
 Source21:       firefox.sh.in
 Source23:       firefox.1
@@ -112,8 +112,8 @@ BuildRequires:  desktop-file-utils
 
 BuildRequires:  mesa-libGL-devel
 BuildRequires:  system-bookmarks
-Requires:       system-bookmarks
 Requires:       redhat-indexhtml
+
 %if %{?system_sqlite}
 BuildRequires:  sqlite-devel >= %{sqlite_version}
 Requires:       sqlite >= %{sqlite_build_version}
@@ -531,8 +531,8 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 #---------------------------------------------------------------------
 
 %changelog
-* Thu Jul 02 2015 CentOS Sources <bugs@centos.org> - 38.1.0-1.el7.centos
-- CentOS default prefs
+* Thu Aug  6 2015 Jan Horak <jhorak@redhat.com> - 38.1.1-1
+- Update to 38.1.1 ESR
 
 * Thu Jun 25 2015 Jan Horak <jhorak@redhat.com> - 38.1.0-1
 - Update to 38.1.0 ESR
