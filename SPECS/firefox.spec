@@ -65,7 +65,7 @@ Source1:        firefox-langpacks-%{version}%{?ext_version}-20150826.tar.bz2
 %endif
 Source10:       firefox-mozconfig
 Source11:       firefox-mozconfig-branded
-Source12:       firefox-redhat-default-prefs.js
+Source12:       firefox-centos-default-prefs.js
 Source20:       firefox.desktop
 Source21:       firefox.sh.in
 Source23:       firefox.1
@@ -531,6 +531,9 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 #---------------------------------------------------------------------
 
 %changelog
+* Thu Aug 27 2015 CentOS Sources <bugs@centos.org> - 38.2.1-1.el7.centos
+- CentOS default prefs
+
 * Wed Aug 26 2015 Martin Stransky <stransky@redhat.com> - 38.2.1-1
 - Update to 38.2.1 ESR
 
