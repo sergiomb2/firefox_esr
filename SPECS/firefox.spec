@@ -53,19 +53,19 @@
 
 Summary:        Mozilla Firefox Web browser
 Name:           firefox
-Version:        38.2.0
-Release:        4%{?prever}%{?dist}
+Version:        38.2.1
+Release:        1%{?prever}%{?dist}
 URL:            http://www.mozilla.org/projects/firefox/
 License:        MPLv1.1 or GPLv2+ or LGPLv2+
 Group:          Applications/Internet
 # From ftp://ftp.mozilla.org/pub/firefox/releases/%{version}%{?pretag}/source
 Source0:        firefox-%{version}%{?prever}%{?ext_version}.source.tar.bz2
 %if %{build_langpacks}
-Source1:        firefox-langpacks-%{version}%{?ext_version}-20150807.tar.bz2
+Source1:        firefox-langpacks-%{version}%{?ext_version}-20150826.tar.bz2
 %endif
 Source10:       firefox-mozconfig
 Source11:       firefox-mozconfig-branded
-Source12:       firefox-centos-default-prefs.js
+Source12:       firefox-redhat-default-prefs.js
 Source20:       firefox.desktop
 Source21:       firefox.sh.in
 Source23:       firefox.1
@@ -531,8 +531,8 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 #---------------------------------------------------------------------
 
 %changelog
-* Tue Aug 11 2015 CentOS Sources <bugs@centos.org> - 38.2.0-4.el7.centos
-- CentOS default prefs
+* Wed Aug 26 2015 Martin Stransky <stransky@redhat.com> - 38.2.1-1
+- Update to 38.2.1 ESR
 
 * Fri Aug  7 2015 Jan Horak <jhorak@redhat.com> - 38.2.0-4
 - Update to 38.2.0 ESR
