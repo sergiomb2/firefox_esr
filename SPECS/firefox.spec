@@ -53,19 +53,19 @@
 
 Summary:        Mozilla Firefox Web browser
 Name:           firefox
-Version:        38.2.1
-Release:        1%{?prever}%{?dist}
+Version:        38.3.0
+Release:        2%{?prever}%{?dist}
 URL:            http://www.mozilla.org/projects/firefox/
 License:        MPLv1.1 or GPLv2+ or LGPLv2+
 Group:          Applications/Internet
 # From ftp://ftp.mozilla.org/pub/firefox/releases/%{version}%{?pretag}/source
 Source0:        firefox-%{version}%{?prever}%{?ext_version}.source.tar.bz2
 %if %{build_langpacks}
-Source1:        firefox-langpacks-%{version}%{?ext_version}-20150826.tar.bz2
+Source1:        firefox-langpacks-%{version}%{?ext_version}-20150917.tar.bz2
 %endif
 Source10:       firefox-mozconfig
 Source11:       firefox-mozconfig-branded
-Source12:       firefox-centos-default-prefs.js
+Source12:       firefox-redhat-default-prefs.js
 Source20:       firefox.desktop
 Source21:       firefox.sh.in
 Source23:       firefox.1
@@ -96,6 +96,7 @@ Patch109:        aarch64-fix-skia.patch
 Patch200:       firefox-duckduckgo.patch
 Patch201:       mozilla-1005535.patch
 Patch202:       mozilla-1152515.patch
+Patch203:       mozilla-1204147.patch
 
 %if %{official_branding}
 # Required by Mozilla Corporation
@@ -214,6 +215,7 @@ cd %{tarballdir}
 %patch200 -p1 -b .duckduckgo
 %patch201 -p1 -b .mozbz-1005535
 %patch202 -p1 -b .mozbz-1152515
+%patch203 -p1 -b .mozilla-1204147
 
 # Upstream patches
 
@@ -531,8 +533,8 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 #---------------------------------------------------------------------
 
 %changelog
-* Thu Aug 27 2015 CentOS Sources <bugs@centos.org> - 38.2.1-1.el7.centos
-- CentOS default prefs
+* Tue Sep 15 2015 Jan Horak <jhorak@redhat.com> - 38.3.0-2
+- Update to 38.3.0 ESR
 
 * Wed Aug 26 2015 Martin Stransky <stransky@redhat.com> - 38.2.1-1
 - Update to 38.2.1 ESR

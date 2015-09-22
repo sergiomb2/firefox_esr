@@ -1,0 +1,28 @@
+# HG changeset patch
+# Parent c0abc2a6e11f52761366e029eb1bae4c9864a8a3
+# User Jorg K <mozilla@jorgk.com>
+Bug 1204147 - Prevent content preferences being written when they shouldn't. r=roc
+
+diff --git a/editor/composer/nsEditorSpellCheck.cpp b/editor/composer/nsEditorSpellCheck.cpp
+--- a/editor/composer/nsEditorSpellCheck.cpp
++++ b/editor/composer/nsEditorSpellCheck.cpp
+@@ -648,16 +648,19 @@ nsEditorSpellCheck::CheckCurrentDictiona
+   }
+ 
+   // If our preferred current dictionary has gone, pick another one.
+   nsTArray<nsString> dictList;
+   rv = mSpellChecker->GetDictionaryList(&dictList);
+   NS_ENSURE_SUCCESS(rv, rv);
+ 
+   if (dictList.Length() > 0) {
++    // Use RAII object to prevent content preferences being written during
++    // this call.
++    UpdateDictionaryHolder holder(this);
+     rv = SetCurrentDictionary(dictList[0]);
+     NS_ENSURE_SUCCESS(rv, rv);
+   }
+ 
+   return NS_OK;
+ }
+ 
+ NS_IMETHODIMP
