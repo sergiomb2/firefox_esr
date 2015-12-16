@@ -16,6 +16,13 @@
 
 # Do we build a final version?
 %define official_branding       1
+%ifarch s390x
+%define use_bundled_gcc         1
+%else
+%define use_bundled_gcc         0
+%endif
+%define gcc_version             4.8.2-15
+
 
 # Minimal required versions
 %if %{?system_nss}
@@ -50,27 +57,28 @@
 %define ext_version esr
 %endif
 
-
 Summary:        Mozilla Firefox Web browser
 Name:           firefox
-Version:        38.4.0
-Release:        1%{?prever}%{?dist}
+Version:        38.5.0
+Release:        3%{?prever}%{?dist}
 URL:            http://www.mozilla.org/projects/firefox/
 License:        MPLv1.1 or GPLv2+ or LGPLv2+
 Group:          Applications/Internet
+
 # From ftp://ftp.mozilla.org/pub/firefox/releases/%{version}%{?pretag}/source
 Source0:        firefox-%{version}%{?prever}%{?ext_version}.source.tar.bz2
 %if %{build_langpacks}
-Source1:        firefox-langpacks-%{version}%{?ext_version}-20151029.tar.bz2
+Source1:        firefox-langpacks-%{version}%{?ext_version}-20151215.tar.bz2
 %endif
 Source10:       firefox-mozconfig
 Source11:       firefox-mozconfig-branded
-Source12:       firefox-centos-default-prefs.js
+Source12:       firefox-redhat-default-prefs.js
 Source20:       firefox.desktop
 Source21:       firefox.sh.in
 Source23:       firefox.1
 Source24:       mozilla-api-key
 Source100:      find-external-requires
+Source300:      gcc48-%{gcc_version}.el6.src.rpm
 
 # Build patches
 Patch0:         firefox-install-dir.patch
@@ -98,12 +106,12 @@ Patch201:       mozilla-1005535.patch
 Patch202:       mozilla-1152515.patch
 Patch203:       mozilla-1204147.patch
 
+
 %if %{official_branding}
 # Required by Mozilla Corporation
 
 %else
 # Not yet approved by Mozillla Corporation
-
 
 %endif
 
@@ -176,6 +184,119 @@ Obsoletes:      firefox < 24.1.0
 Conflicts:      firefox < 24.1.0
 Provides:       webclient
 
+# GCC 4.8 BuildRequires
+# ==================================================================================
+%if %{use_bundled_gcc}
+
+%ifarch s390x
+%global multilib_32_arch s390
+%endif
+%ifarch sparc64
+%global multilib_32_arch sparcv9
+%endif
+%ifarch ppc64
+%global multilib_32_arch ppc
+%endif
+%ifarch x86_64
+%if 0%{?rhel} >= 6
+%global multilib_32_arch i686
+%else
+%global multilib_32_arch i386
+%endif
+%endif
+
+%global multilib_64_archs sparc64 ppc64 s390x x86_64
+
+%if 0%{?rhel} >= 6
+# Need binutils which support --build-id >= 2.17.50.0.17-3
+# Need binutils which support %gnu_unique_object >= 2.19.51.0.14
+# Need binutils which support .cfi_sections >= 2.19.51.0.14-33
+BuildRequires: binutils >= 2.19.51.0.14-33
+# While gcc doesn't include statically linked binaries, during testing
+# -static is used several times.
+BuildRequires: glibc-static
+%else
+# Don't have binutils which support --build-id >= 2.17.50.0.17-3
+# Don't have binutils which support %gnu_unique_object >= 2.19.51.0.14
+# Don't have binutils which  support .cfi_sections >= 2.19.51.0.14-33
+BuildRequires: binutils >= 2.17.50.0.2-8
+%endif
+BuildRequires: zlib-devel, gettext, dejagnu, bison, flex, texinfo, sharutils
+BuildRequires: /usr/bin/pod2man
+%if 0%{?rhel} >= 7
+BuildRequires: texinfo-tex
+%endif
+#BuildRequires: systemtap-sdt-devel >= 1.3
+# For VTA guality testing
+BuildRequires: gdb
+# Make sure pthread.h doesn't contain __thread tokens
+# Make sure glibc supports stack protector
+# Make sure glibc supports DT_GNU_HASH
+BuildRequires: glibc-devel >= 2.4.90-13
+%if 0%{?rhel} >= 6
+BuildRequires: elfutils-devel >= 0.147
+BuildRequires: elfutils-libelf-devel >= 0.147
+%else
+BuildRequires: elfutils-devel >= 0.72
+%endif
+%ifarch ppc ppc64 s390 s390x sparc sparcv9 alpha
+# Make sure glibc supports TFmode long double
+BuildRequires: glibc >= 2.3.90-35
+%endif
+%ifarch %{multilib_64_archs} sparcv9 ppc
+# Ensure glibc{,-devel} is installed for both multilib arches
+BuildRequires: /lib/libc.so.6 /usr/lib/libc.so /lib64/libc.so.6 /usr/lib64/libc.so
+%endif
+%ifarch ia64
+BuildRequires: libunwind >= 0.98
+%endif
+# Need .eh_frame ld optimizations
+# Need proper visibility support
+# Need -pie support
+# Need --as-needed/--no-as-needed support
+# On ppc64, need omit dot symbols support and --non-overlapping-opd
+# Need binutils that owns /usr/bin/c++filt
+# Need binutils that support .weakref
+# Need binutils that supports --hash-style=gnu
+# Need binutils that support mffgpr/mftgpr
+#%if 0%{?rhel} >= 6
+## Need binutils which support --build-id >= 2.17.50.0.17-3
+## Need binutils which support %gnu_unique_object >= 2.19.51.0.14
+## Need binutils which support .cfi_sections >= 2.19.51.0.14-33
+#Requires: binutils >= 2.19.51.0.14-33
+#%else
+## Don't have binutils which support --build-id >= 2.17.50.0.17-3
+## Don't have binutils which support %gnu_unique_object >= 2.19.51.0.14
+## Don't have binutils which  support .cfi_sections >= 2.19.51.0.14-33
+#Requires: binutils >= 2.17.50.0.2-8
+#%endif
+## Make sure gdb will understand DW_FORM_strp
+#Conflicts: gdb < 5.1-2
+#Requires: glibc-devel >= 2.2.90-12
+#%ifarch ppc ppc64 s390 s390x sparc sparcv9 alpha
+## Make sure glibc supports TFmode long double
+#Requires: glibc >= 2.3.90-35
+#%endif
+#Requires: libgcc >= 4.1.2-43
+#Requires: libgomp >= 4.4.4-13
+#%if 0%{?rhel} == 6
+#Requires: libstdc++ >= 4.4.4-13
+#%else
+#Requires: libstdc++ = 4.1.2
+#%endif
+##FIXME gcc version
+#Requires: libstdc++-devel = %{version}-%{release}
+BuildRequires: gmp-devel >= 4.1.2-8
+%if 0%{?rhel} >= 6
+BuildRequires: mpfr-devel >= 2.2.1
+%endif
+%if 0%{?rhel} >= 7
+BuildRequires: libmpc-devel >= 0.8.1
+%endif
+
+%endif # bundled gcc BuildRequires
+# ==================================================================================
+
 %define _use_internal_dependency_generator 0
 %define __find_requires %{SOURCE100}
 
@@ -189,7 +310,6 @@ compliance, performance and portability.
 %setup -q -c
 cd %{tarballdir}
 
-# test if they exists
 # Build patches
 # We have to keep original patch backup extension to go thru configure without problems with tests
 %patch0 -p1 -b .orig
@@ -292,6 +412,23 @@ echo "ac_add_options --enable-optimize" >> .mozconfig
 #---------------------------------------------------------------------
 
 %build
+%if %{use_bundled_gcc}
+GCC_FILE="gcc48-%{gcc_version}*.rpm"
+GCC_PATH="%{_rpmdir}"
+
+rpmbuild --nodeps --rebuild %{SOURCE300}
+cd %{_rpmdir}
+if [ ! -f $GCC_PATH/$GCC_FILE ]; then
+    GCC_PATH="$GCC_PATH/%{_arch}"
+fi
+rpm2cpio $GCC_PATH/$GCC_FILE | cpio -iduv
+# Clean gcc48 rpms to avoid including them to package
+rm -f gcc48-*.rpm
+cd -
+PATH=%{_rpmdir}/usr/bin:$PATH
+export PATH
+export CXX=g++
+%endif  # bundled gcc
 %if %{?system_sqlite}
 # Do not proceed with build if the sqlite require would be broken:
 # make sure the minimum requirement is non-empty, ...
@@ -533,8 +670,8 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 #---------------------------------------------------------------------
 
 %changelog
-* Wed Nov 04 2015 CentOS Sources <bugs@centos.org> - 38.4.0-1.el7.centos
-- CentOS default prefs
+* Fri Dec 11 2015 Jan Horak <jhorak@redhat.com> - 38.5.0-3
+- Update to 38.5.0 ESR
 
 * Thu Oct 29 2015 Jan Horak <jhorak@redhat.com> - 38.4.0-1
 - Update to 38.4.0 ESR
