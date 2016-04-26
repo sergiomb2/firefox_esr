@@ -104,7 +104,7 @@ Source0:        firefox-%{version}%{?ext_version}.source.tar.xz
 Source1:        firefox-langpacks-%{version}%{?ext_version}-20160421.tar.xz
 %endif
 Source10:       firefox-mozconfig
-Source12:       firefox-redhat-default-prefs.js
+Source12:       firefox-centos-default-prefs.js
 Source20:       firefox.desktop
 Source500:      firefox.sh.in.rhel5
 Source600:      firefox.sh.in.rhel6
@@ -117,7 +117,7 @@ Source300:      gcc48-%{gcc_version}.el5.src.rpm
 Source301:      yasm-1.2.0-3.el5.src.rpm
 Source302:      devtoolset-2-binutils-2.23.52.0.1-10.el5.src.rpm
 # RHEL5 bookmarks
-Source501:       firefox-redhat-default-bookmarks.html
+Source501:       firefox-centos-default-bookmarks.html
 
 # Build patches
 Patch0:         firefox-install-dir.patch
@@ -937,6 +937,9 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 #---------------------------------------------------------------------
 
 %changelog
+* Tue Apr 26 2016 Johnny Hughes <johnny@centos.org> - 45.1.0-1
+- Roll in CentOS Branding
+
 * Thu Apr 21 2016 Jan Horak <jhorak@redhat.com> - 45.1.0-1
 - Update to 45.1.0 ESR
 
