@@ -1,0 +1,21 @@
+diff -up firefox-45.0.1esr/configure.in.nss firefox-45.0.1esr/configure.in
+--- firefox-45.0.1esr/configure.in.nss	2016-04-06 10:20:01.000000000 +0200
++++ firefox-45.0.1esr/configure.in	2016-04-06 10:25:56.998285981 +0200
+@@ -53,7 +53,7 @@ dnl ====================================
+ MOZJPEG=62
+ MOZPNG=10619
+ NSPR_VERSION=4
+-NSPR_MINVER=4.12
++NSPR_MINVER=4.11
+ NSS_VERSION=3
+ 
+ dnl Set the minimum version of toolkit libs used by mozilla
+@@ -3451,7 +3451,7 @@ MOZ_ARG_WITH_BOOL(system-nss,
+     _USE_SYSTEM_NSS=1 )
+ 
+ if test -n "$_USE_SYSTEM_NSS"; then
+-    AM_PATH_NSS(3.21.1, [MOZ_NATIVE_NSS=1], [AC_MSG_ERROR([you don't have NSS installed or your version is too old])])
++    AM_PATH_NSS(3.21.0, [MOZ_NATIVE_NSS=1], [AC_MSG_ERROR([you don't have NSS installed or your version is too old])])
+ fi
+ 
+ if test -n "$MOZ_NATIVE_NSS"; then

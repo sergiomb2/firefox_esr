@@ -1,0 +1,27 @@
+diff -up mozilla-aurora/media/webrtc/trunk/webrtc/modules/desktop_capture/mouse_cursor_monitor_x11.cc.xlib-swap mozilla-aurora/media/webrtc/trunk/webrtc/modules/desktop_capture/mouse_cursor_monitor_x11.cc
+--- mozilla-aurora/media/webrtc/trunk/webrtc/modules/desktop_capture/mouse_cursor_monitor_x11.cc.xlib-swap	2016-01-15 12:50:55.900989372 +0100
++++ mozilla-aurora/media/webrtc/trunk/webrtc/modules/desktop_capture/mouse_cursor_monitor_x11.cc	2016-01-15 12:51:40.592950518 +0100
+@@ -10,8 +10,8 @@
+ 
+ #include "webrtc/modules/desktop_capture/mouse_cursor_monitor.h"
+ 
+-#include <X11/extensions/Xfixes.h>
+ #include <X11/Xlib.h>
++#include <X11/extensions/Xfixes.h>
+ #include <X11/Xutil.h>
+ 
+ #include "webrtc/base/scoped_ptr.h"
+diff -up mozilla-aurora/media/webrtc/trunk/webrtc/modules/desktop_capture/screen_capturer_x11.cc.xlib-swap mozilla-aurora/media/webrtc/trunk/webrtc/modules/desktop_capture/screen_capturer_x11.cc
+--- mozilla-aurora/media/webrtc/trunk/webrtc/modules/desktop_capture/screen_capturer_x11.cc.xlib-swap	2016-01-15 12:50:48.652995674 +0100
++++ mozilla-aurora/media/webrtc/trunk/webrtc/modules/desktop_capture/screen_capturer_x11.cc	2016-01-15 12:51:34.005956245 +0100
+@@ -13,9 +13,9 @@
+ #include <string.h>
+ #include <set>
+ 
++#include <X11/Xlib.h>
+ #include <X11/extensions/Xdamage.h>
+ #include <X11/extensions/Xfixes.h>
+-#include <X11/Xlib.h>
+ #include <X11/Xutil.h>
+ 
+ #include "webrtc/base/scoped_ptr.h"

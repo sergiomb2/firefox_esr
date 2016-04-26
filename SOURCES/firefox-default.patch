@@ -1,28 +1,28 @@
-diff -up mozilla-aurora/browser/components/preferences/advanced.xul.default mozilla-aurora/browser/components/preferences/advanced.xul
---- mozilla-aurora/browser/components/preferences/advanced.xul.default	2015-03-12 13:21:15.000000000 +0100
-+++ mozilla-aurora/browser/components/preferences/advanced.xul	2015-03-12 14:23:22.419249264 +0100
-@@ -58,7 +58,7 @@
-                   type="bool"/>
+diff -up mozilla-aurora/browser/components/preferences/in-content/advanced.xul.default mozilla-aurora/browser/components/preferences/in-content/advanced.xul
+--- mozilla-aurora/browser/components/preferences/in-content/advanced.xul.default	2016-01-28 16:47:37.376005810 +0100
++++ mozilla-aurora/browser/components/preferences/in-content/advanced.xul	2016-01-28 16:48:40.113963249 +0100
+@@ -63,7 +63,7 @@
+               type="bool"/>
  
-      <!-- Update tab -->
+  <!-- Update tab -->
 -#ifdef MOZ_UPDATER
 +#ifdef 0
-       <preference id="app.update.enabled"              name="app.update.enabled"              type="bool"/>
-       <preference id="app.update.auto"                 name="app.update.auto"                 type="bool"/>
- #ifdef XP_WIN
-@@ -95,7 +95,7 @@
-                   type="int"/>
-     </preferences>
+   <preference id="app.update.enabled"
+               name="app.update.enabled"
+               type="bool"/>
+@@ -107,7 +107,7 @@
+               type="int"/>
+ </preferences>
  
 -#ifdef HAVE_SHELL_SERVICE
 +#ifdef 0
-     <stringbundle id="bundleShell" src="chrome://browser/locale/shellservice.properties"/>
-     <stringbundle id="bundleBrand" src="chrome://branding/locale/brand.properties"/>
+   <stringbundle id="bundleShell" src="chrome://browser/locale/shellservice.properties"/>
+   <stringbundle id="bundleBrand" src="chrome://branding/locale/brand.properties"/>
  #endif
 diff -up mozilla-aurora/browser/components/shell/nsGNOMEShellService.cpp.default mozilla-aurora/browser/components/shell/nsGNOMEShellService.cpp
---- mozilla-aurora/browser/components/shell/nsGNOMEShellService.cpp.default	2015-03-12 13:21:16.000000000 +0100
-+++ mozilla-aurora/browser/components/shell/nsGNOMEShellService.cpp	2015-03-12 14:23:22.419249264 +0100
-@@ -149,8 +149,8 @@ nsGNOMEShellService::GetAppPathFromLaunc
+--- mozilla-aurora/browser/components/shell/nsGNOMEShellService.cpp.default	2015-12-16 16:47:31.000000000 +0100
++++ mozilla-aurora/browser/components/shell/nsGNOMEShellService.cpp	2016-01-28 16:47:37.376005810 +0100
+@@ -150,8 +150,8 @@ nsGNOMEShellService::GetAppPathFromLaunc
  bool
  nsGNOMEShellService::KeyMatchesAppName(const char *aKeyValue) const
  {
@@ -32,7 +32,7 @@ diff -up mozilla-aurora/browser/components/shell/nsGNOMEShellService.cpp.default
    if (mUseLocaleFilenames) {
      gchar *nativePath = g_filename_from_utf8(aKeyValue, -1,
                                               nullptr, nullptr, nullptr);
-@@ -159,17 +159,13 @@ nsGNOMEShellService::KeyMatchesAppName(c
+@@ -160,17 +160,13 @@ nsGNOMEShellService::KeyMatchesAppName(c
        return false;
      }
  
@@ -53,7 +53,7 @@ diff -up mozilla-aurora/browser/components/shell/nsGNOMEShellService.cpp.default
    return matches;
  }
  
-@@ -254,16 +250,7 @@ nsGNOMEShellService::SetDefaultBrowser(b
+@@ -255,16 +251,7 @@ nsGNOMEShellService::SetDefaultBrowser(b
    nsCOMPtr<nsIGConfService> gconf = do_GetService(NS_GCONFSERVICE_CONTRACTID);
    nsCOMPtr<nsIGIOService> giovfs = do_GetService(NS_GIOSERVICE_CONTRACTID);
    if (gconf) {
@@ -72,10 +72,10 @@ diff -up mozilla-aurora/browser/components/shell/nsGNOMEShellService.cpp.default
  
      for (unsigned int i = 0; i < ArrayLength(appProtocols); ++i) {
 diff -up mozilla-aurora/browser/components/shell/nsGNOMEShellService.h.default mozilla-aurora/browser/components/shell/nsGNOMEShellService.h
---- mozilla-aurora/browser/components/shell/nsGNOMEShellService.h.default	2015-03-12 13:21:16.000000000 +0100
-+++ mozilla-aurora/browser/components/shell/nsGNOMEShellService.h	2015-03-12 14:23:22.420249261 +0100
+--- mozilla-aurora/browser/components/shell/nsGNOMEShellService.h.default	2015-12-16 16:47:31.000000000 +0100
++++ mozilla-aurora/browser/components/shell/nsGNOMEShellService.h	2016-01-28 16:47:37.376005810 +0100
 @@ -13,7 +13,7 @@
- class nsGNOMEShellService MOZ_FINAL : public nsIShellService
+ class nsGNOMEShellService final : public nsIShellService
  {
  public:
 -  nsGNOMEShellService() : mCheckedThisSession(false), mAppIsInPath(false) { }

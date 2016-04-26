@@ -1,0 +1,18 @@
+diff -up mozilla-beta/xpcom/threads/ThreadStackHelper.cpp.rt-tgsigqueueinfo mozilla-beta/xpcom/threads/ThreadStackHelper.cpp
+--- mozilla-beta/xpcom/threads/ThreadStackHelper.cpp.rt-tgsigqueueinfo	2015-04-16 23:45:29.000000000 +0200
++++ mozilla-beta/xpcom/threads/ThreadStackHelper.cpp	2015-04-22 09:10:25.291166226 +0200
+@@ -240,10 +240,13 @@ ThreadStackHelper::GetStack(Stack& aStac
+   uinfo.si_pid = getpid();
+   uinfo.si_uid = getuid();
+   uinfo.si_value.sival_ptr = this;
++#ifdef SYS_rt_tgsigqueueinfo
+   if (::syscall(SYS_rt_tgsigqueueinfo, uinfo.si_pid,
+-                mThreadID, sFillStackSignum, &uinfo)) {
++                mThreadID, sFillStackSignum, &uinfo))
+     // rt_tgsigqueueinfo was added in Linux 2.6.31.
+     // Could have failed because the syscall did not exist.
++#endif
++  {
+     return;
+   }
+   MOZ_ALWAYS_TRUE(!::sem_wait(&mSem));

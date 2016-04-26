@@ -1,0 +1,47 @@
+diff -up mozilla-aurora/security/sandbox/linux/LinuxCapabilities.h.build-el5-stdint mozilla-aurora/security/sandbox/linux/LinuxCapabilities.h
+--- mozilla-aurora/security/sandbox/linux/LinuxCapabilities.h.build-el5-stdint	2015-12-16 16:47:02.000000000 +0100
++++ mozilla-aurora/security/sandbox/linux/LinuxCapabilities.h	2016-01-26 15:52:02.557401691 +0100
+@@ -7,7 +7,32 @@
+ #ifndef mozilla_LinuxCapabilities_h
+ #define mozilla_LinuxCapabilities_h
+ 
++#define int64_t int64_t_linux
++#define uint64_t uint64_t_linux
++#define loff_t loff_t_linux
++#define dev_t dev_t_linux
++#define timer_t timer_t_linux
++#define u_int64_t u_int64_t_linux
++#define fd_set fd_set_linux
++#define blkcnt_t blkcnt_t_linux
++#define gid_t gid_t_linux
++#define mode_t mode_t_linux
++#define nlink_t nlink_t_linux
++#define uid_t uid_t_linux
+ #include <linux/capability.h>
++#undef int64_t
++#undef uint64_t
++#undef loff_t
++#undef dev_t
++#undef timer_t
++#undef u_int64_t
++#undef fd_set
++#undef blkcnt_t
++#undef gid_t
++#undef mode_t
++#undef nlink_t
++#undef uid_t
++
+ #include <stdint.h>
+ 
+ #include "mozilla/Assertions.h"
+diff -up mozilla-aurora/security/sandbox/linux/SandboxFilterUtil.cpp.build-el5-stdint mozilla-aurora/security/sandbox/linux/SandboxFilterUtil.cpp
+--- mozilla-aurora/security/sandbox/linux/SandboxFilterUtil.cpp.build-el5-stdint	2016-01-25 20:56:57.937678560 +0100
++++ mozilla-aurora/security/sandbox/linux/SandboxFilterUtil.cpp	2016-01-25 20:58:25.574613828 +0100
+@@ -13,6 +13,7 @@
+ 
+ #include "mozilla/UniquePtr.h"
+ #include "sandbox/linux/bpf_dsl/bpf_dsl.h"
++#include <asm-generic/ipc.h>
+ 
+ // Older kernel headers (mostly Android, but also some older desktop
+ // distributions) are missing some or all of these:

@@ -1,3 +1,6 @@
-42dbd9ef7e3b5b4aabd2dee602e982146b457d18 SOURCES/firefox-38.7.0esr.source.tar.bz2
-32d36274e5bf94aed292945bb2653918f66b057e SOURCES/firefox-langpacks-38.7.0esr-20160303.tar.bz2
-39c11b21e3a50ea91d0b99d6ee6500e2e1377267 SOURCES/gcc48-4.8.2-15.el6.src.rpm
+511960dd78451a06c9df76509635aeec05b2051a SOURCES/Python-2.7.8.tgz
+467bdb846d67c01aed9e521fe0ef280065a50c3c SOURCES/devtoolset-2-binutils-2.23.52.0.1-10.el5.src.rpm
+177b27772d1009bfc277577ad4e97d538073f508 SOURCES/firefox-45.1.0esr.source.tar.xz
+e426ed2cea6e0335b979a0ebbfa83ef2ae8f6b28 SOURCES/firefox-langpacks-45.1.0esr-20160421.tar.xz
+e5ba84786af5d0e0e23b1a9112c76821ef23306c SOURCES/gcc48-4.8.2-16.el5.src.rpm
+77fd30f7ebc12a629a31c1e252cec06af55a71fe SOURCES/yasm-1.2.0-3.el5.src.rpm

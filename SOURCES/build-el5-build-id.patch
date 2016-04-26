@@ -1,0 +1,15 @@
+diff -up mozilla-esr31/tools/profiler/LulElf.cpp.python3 mozilla-esr31/tools/profiler/LulElf.cpp
+--- mozilla-esr31/tools/profiler/lul/LulElf.cpp.python3	2014-08-25 15:17:29.000000000 +0200
++++ mozilla-esr31/tools/profiler/lul/LulElf.cpp	2014-09-05 15:26:14.114681217 +0200
+@@ -69,6 +69,11 @@
+ #include "LulElfInt.h"
+ #include "LulMainInt.h"
+ 
++#ifndef NT_GNU_BUILD_ID
++#define NT_GNU_BUILD_ID 3
++#endif
++
++
+ 
+ #if defined(LUL_PLAT_arm_android) && !defined(SHT_ARM_EXIDX)
+ // bionic and older glibsc don't define it

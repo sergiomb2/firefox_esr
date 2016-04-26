@@ -1,0 +1,12 @@
+diff -up mozilla-aurora/config/external/nss/Makefile.in.build-el5-nss mozilla-aurora/config/external/nss/Makefile.in
+--- mozilla-aurora/config/external/nss/Makefile.in.build-el5-nss	2016-01-26 10:25:01.770613169 +0100
++++ mozilla-aurora/config/external/nss/Makefile.in	2016-01-26 10:25:12.824599219 +0100
+@@ -298,7 +298,7 @@ NSS_DIRS += \
+ endif
+ 
+ ifneq (,$(filter %--build-id,$(LDFLAGS)))
+-DEFAULT_GMAKE_ENV = LDFLAGS=-Wl,--build-id
++#DEFAULT_GMAKE_ENV = LDFLAGS=-Wl,--build-id
+ endif
+ 
+ ifdef MOZ_FOLD_LIBS

@@ -1,0 +1,100 @@
+diff -up mozilla-aurora/gfx/thebes/gfxFcPlatformFontList.cpp.build-el5-fontconfig mozilla-aurora/gfx/thebes/gfxFcPlatformFontList.cpp
+--- mozilla-aurora/gfx/thebes/gfxFcPlatformFontList.cpp.build-el5-fontconfig	2015-12-16 16:47:28.000000000 +0100
++++ mozilla-aurora/gfx/thebes/gfxFcPlatformFontList.cpp	2016-01-19 14:20:43.676153725 +0100
+@@ -367,7 +367,48 @@ gfxFontconfigFontEntry::gfxFontconfigFon
+     // "blanks", effectively assuming that, if the font has a blank glyph,
+     // then the author intends any associated character to be rendered
+     // blank.
+-    mFontPattern = FcFreeTypeQueryFace(mFTFace, ToFcChar8Ptr(""), 0, nullptr);
++    // BACKPORT: FcFreeTypeQueryFace is not available in RHEL5's fontconfig
++    // mFontPattern = FcFreeTypeQueryFace(mFTFace, ToFcChar8Ptr(""), 0, nullptr);
++
++
++    // FC_CHARSET is vital to determine which characters are supported.
++    nsAutoRef<FcCharSet> charset(FcFreeTypeCharSet(mFTFace, nullptr));
++    // If there are no characters then assume we don't know how to read
++    // this font.
++    if (!charset || FcCharSetCount(charset) == 0)
++      return;
++
++    mFontPattern = FcPatternCreate();
++    FcPatternAddCharSet(mFontPattern, FC_CHARSET, charset);
++
++    // FC_PIXEL_SIZE can be important for font selection of fixed-size
++    // fonts.
++    if (!(mFTFace->face_flags & FT_FACE_FLAG_SCALABLE)) {
++      for (FT_Int i = 0; i < mFTFace->num_fixed_sizes; ++i) {
++#if HAVE_FT_BITMAP_SIZE_Y_PPEM
++        double size = FLOAT_FROM_26_6(mFTFace->available_sizes[i].y_ppem);
++#else
++        double size = mFTFace->available_sizes[i].height;
++#endif
++        FcPatternAddDouble (mFontPattern, FC_PIXEL_SIZE, size);
++      }
++
++      // Not sure whether this is important;
++      // imitating FcFreeTypeQueryFace:
++      FcPatternAddBool (mFontPattern, FC_ANTIALIAS, FcFalse);
++    }
++
++    // Setting up the FC_LANGSET property is very difficult with the APIs
++    // available prior to FcFreeTypeQueryFace.  Having no FC_LANGSET
++    // property seems better than having a property with an empty LangSet.
++    // With no FC_LANGSET property, fontconfig sort functions will
++    // consider this face to have the same priority as (otherwise equal)
++    // faces that have support for the primary requested language, but
++    // will not consider any language to have been satisfied (and so will
++    // continue to look for a face with language support in fallback
++    // fonts).
++
++    // END BACKPORT
+     // given that we have a FT_Face, not really sure this is possible...
+     if (!mFontPattern) {
+         mFontPattern = FcPatternCreate();
+@@ -1015,9 +1056,12 @@ gfxFcPlatformFontList::gfxFcPlatformFont
+     , mAlwaysUseFontconfigGenerics(true)
+ {
+     // if the rescan interval is set, start the timer
+-    int rescanInterval = FcConfigGetRescanInterval(nullptr);
++    // BACKPORT - do not implement rescan interval
++    //int rescanInterval = FcConfigGetRescanInterval(nullptr);
++    int rescanInterval = 0;
+     if (rescanInterval) {
+-        mLastConfig = FcConfigGetCurrent();
++        nsAutoRef<FcConfig> fc_conf(FcConfigGetCurrent());
++        mLastConfig = fc_conf.out();
+         mCheckFontUpdatesTimer = do_CreateInstance("@mozilla.org/timer;1");
+         if (mCheckFontUpdatesTimer) {
+             mCheckFontUpdatesTimer->
+@@ -1131,7 +1175,8 @@ gfxFcPlatformFontList::AddFontSetFamilie
+ nsresult
+ gfxFcPlatformFontList::InitFontList()
+ {
+-    mLastConfig = FcConfigGetCurrent();
++    nsAutoRef<FcConfig> fc_conf(FcConfigGetCurrent());
++    mLastConfig = fc_conf.out();
+ 
+     // reset font lists
+     gfxPlatformFontList::InitFontList();
+diff -up mozilla-aurora/gfx/thebes/gfxFcPlatformFontList.h.build-el5-fontconfig mozilla-aurora/gfx/thebes/gfxFcPlatformFontList.h
+--- mozilla-aurora/gfx/thebes/gfxFcPlatformFontList.h.build-el5-fontconfig	2016-01-19 11:45:08.927745469 +0100
++++ mozilla-aurora/gfx/thebes/gfxFcPlatformFontList.h	2016-01-19 13:49:58.296124911 +0100
+@@ -33,7 +33,8 @@ class nsAutoRefTraits<FcConfig> : public
+ {
+ public:
+     static void Release(FcConfig *ptr) { FcConfigDestroy(ptr); }
+-    static void AddRef(FcConfig *ptr) { FcConfigReference(ptr); }
++    // AddRef is not supported in older font-config
++    // static void AddRef(FcConfig *ptr) { FcConfigReference(ptr); }
+ };
+ 
+ // Helper classes used for clearning out user font data when cairo font
+@@ -290,7 +291,7 @@ protected:
+     nsRefPtrHashtable<nsCStringHashKey, gfxFontFamily> mFcSubstituteCache;
+ 
+     nsCOMPtr<nsITimer> mCheckFontUpdatesTimer;
+-    nsCountedRef<FcConfig> mLastConfig;
++    nsAutoRef<FcConfig> mLastConfig;
+ 
+     // By default, font prefs under Linux are set to simply lookup
+     // via fontconfig the appropriate font for serif/sans-serif/monospace.

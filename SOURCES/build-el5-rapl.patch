@@ -1,0 +1,12 @@
+diff -up mozilla-aurora/tools/power/moz.build.rapl mozilla-aurora/tools/power/moz.build
+--- mozilla-aurora/tools/power/moz.build.rapl	2016-01-18 10:55:59.461937398 +0100
++++ mozilla-aurora/tools/power/moz.build	2016-01-18 10:56:04.483935330 +0100
+@@ -11,7 +11,7 @@ if CONFIG['OS_ARCH'] == 'Darwin' and CON
+ 
+ if CONFIG['OS_ARCH'] == 'Linux' and CONFIG['OS_TARGET'] != 'Android' and \
+    CONFIG['CPU_ARCH'] in ('x86', 'x86_64'):
+-    do_rapl = True
++    do_rapl = False
+ 
+ if do_rapl:
+     SimplePrograms([

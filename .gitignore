@@ -1,3 +1,6 @@
-SOURCES/firefox-38.7.0esr.source.tar.bz2
-SOURCES/firefox-langpacks-38.7.0esr-20160303.tar.bz2
-SOURCES/gcc48-4.8.2-15.el6.src.rpm
+SOURCES/Python-2.7.8.tgz
+SOURCES/devtoolset-2-binutils-2.23.52.0.1-10.el5.src.rpm
+SOURCES/firefox-45.1.0esr.source.tar.xz
+SOURCES/firefox-langpacks-45.1.0esr-20160421.tar.xz
+SOURCES/gcc48-4.8.2-16.el5.src.rpm
+SOURCES/yasm-1.2.0-3.el5.src.rpm
