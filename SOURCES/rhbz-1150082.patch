@@ -1,0 +1,13 @@
+diff -up mozilla-esr31/media/webrtc/trunk/Makefile.old mozilla-esr31/media/webrtc/trunk/Makefile
+diff -up mozilla-esr31/toolkit/components/osfile/modules/osfile_unix_front.jsm.old mozilla-esr31/toolkit/components/osfile/modules/osfile_unix_front.jsm
+--- mozilla-esr31/toolkit/components/osfile/modules/osfile_unix_front.jsm.old	2014-10-11 17:00:02.000000000 +0200
++++ mozilla-esr31/toolkit/components/osfile/modules/osfile_unix_front.jsm	2014-11-10 13:28:58.474001916 +0100
+@@ -574,7 +574,7 @@
+        };
+ 
+        // Fortunately, under Linux, that pumping function can be optimized.
+-       if (UnixFile.splice) {
++       if (0) {
+          const BUFSIZE = 1 << 17;
+ 
+          // An implementation of |pump| using |splice| (for Linux/Android)

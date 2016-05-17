@@ -1,4 +1,3 @@
-# FIXME: HAVE TO USE SYSTEM NSS IN FINAL RELEASE!!!
 %define system_nss              1
 %global nspr_version            4.11.0
 %global nss_version             3.21.0
@@ -89,7 +88,7 @@ ExcludeArch: ppc ia64
 
 Summary:        Mozilla Firefox Web browser
 Name:           firefox
-Version:        45.1.0
+Version:        45.1.1
 Release:        1%{?dist}
 URL:            http://www.mozilla.org/projects/firefox/
 License:        MPLv1.1 or GPLv2+ or LGPLv2+
@@ -101,10 +100,10 @@ Group:          Applications/Internet
 # From ftp://archive.mozilla.org/pub/firefox/releases/%{version}%{?ext_version}/source
 Source0:        firefox-%{version}%{?ext_version}.source.tar.xz
 %if %{build_langpacks}
-Source1:        firefox-langpacks-%{version}%{?ext_version}-20160421.tar.xz
+Source1:        firefox-langpacks-%{version}%{?ext_version}-20160504.tar.xz
 %endif
 Source10:       firefox-mozconfig
-Source12:       firefox-centos-default-prefs.js
+Source12:       firefox-redhat-default-prefs.js
 Source20:       firefox.desktop
 Source500:      firefox.sh.in.rhel5
 Source600:      firefox.sh.in.rhel6
@@ -117,7 +116,7 @@ Source300:      gcc48-%{gcc_version}.el5.src.rpm
 Source301:      yasm-1.2.0-3.el5.src.rpm
 Source302:      devtoolset-2-binutils-2.23.52.0.1-10.el5.src.rpm
 # RHEL5 bookmarks
-Source501:       firefox-centos-default-bookmarks.html
+Source501:       firefox-redhat-default-bookmarks.html
 
 # Build patches
 Patch0:         firefox-install-dir.patch
@@ -126,7 +125,6 @@ Patch6:         webrtc-arch-cpu.patch
 Patch8:         firefox-ppc64le.patch
 Patch16:        mozilla-1253216-disable-ion.patch
 Patch17:        build-nss.patch
-Patch18:        mozilla-1266366-branch64.patch
 
 # RHEL patches
 Patch101:       firefox-default.patch
@@ -135,6 +133,7 @@ Patch103:       rhbz-966424.patch
 Patch106:       firefox-enable-plugins.patch
 Patch109:       aarch64-fix-skia.patch
 Patch110:       mozilla-1170092-etc-conf.patch
+Patch111:       rhbz-1173156.patch
 
 # Upstream patches
 Patch201:       mozilla-1005535.patch
@@ -151,6 +150,7 @@ Patch505:       build-el5-rapl.patch
 Patch506:       build-el5-fontconfig.patch
 Patch507:       build-el5-stdint.patch
 Patch508:       build-el5-nss.patch
+Patch509:       rhbz-1150082.patch
 
 # ---------------------------------------------------
 BuildRoot:      %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
@@ -393,7 +393,6 @@ cd %{tarballdir}
 %patch8 -p2 -b .ppc64le
 %patch16 -p2 -b .moz-1253216-disable-ion
 %patch17 -p1 -b .build-nss
-%patch18 -p1 -b .branch64
 
 # RPM specific patches
 %patch101 -p1 -b .default
@@ -402,6 +401,7 @@ cd %{tarballdir}
 %patch106 -p2 -b .plugins
 %patch109 -p1 -b .aarch64
 %patch110 -p1 -b .moz-1170092-etc-conf
+%patch111 -p2 -b .rhbz-1173156
 
 # Upstream patches
 %patch201 -p1 -b .mozbz-1005535
@@ -420,6 +420,7 @@ cd %{tarballdir}
 %patch506 -p1 -b .build-el5-fontconfig
 %patch507 -p1 -b .build-el5-stdint
 %patch508 -p1 -b .build-el5-nss
+%patch509 -p1 -b .rhbz-1150082
 %endif
 
 %{__rm} -f .mozconfig
@@ -513,6 +514,9 @@ function add_to_mozconfig() {
  add_to_mozconfig "disable-debug"
  add_to_mozconfig "enable-optimize"
 %endif
+
+#Disabled due to rhbz#1330898
+add_to_mozconfig "disable-ffmpeg"
 
 #FIXME RTTI?? RHEL5/6
 # ac_add_options --enable-cpp-rtti
@@ -920,7 +924,6 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 %{mozappdir}/plugin-container
 %{mozappdir}/dependentlibs.list
 %exclude %{mozappdir}/defaults/pref/channel-prefs.js
-%{mozappdir}/gmp-clearkey
 %if !%{?system_nss}
 %{mozappdir}/*.chk
 %endif
@@ -937,8 +940,14 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 #---------------------------------------------------------------------
 
 %changelog
-* Tue Apr 26 2016 Johnny Hughes <johnny@centos.org> - 45.1.0-1
-- Roll in CentOS Branding
+* Wed May  4 2016 Jan Horak <jhorak@redhat.com> - 45.1.1-1
+- Update to 45.1.1 ESR
+
+* Tue May 3 2016 Martin Stransky <stransky@redhat.com> - 45.1.0-3
+- Disabled ffmpeg (rhbz#1330898)
+
+* Fri Apr 29 2016 Jan Horak <jhorak@redhat.com> - 45.1.0-1
+- Fixed some regressions introduced by rebase
 
 * Thu Apr 21 2016 Jan Horak <jhorak@redhat.com> - 45.1.0-1
 - Update to 45.1.0 ESR
