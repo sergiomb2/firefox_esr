@@ -1,0 +1,39 @@
+diff -up firefox-45.2.0esr/netwerk/base/security-prefs.js.mozbz-975832 firefox-45.2.0esr/netwerk/base/security-prefs.js
+--- firefox-45.2.0esr/netwerk/base/security-prefs.js.mozbz-975832	2016-06-20 13:09:46.100405009 +0200
++++ firefox-45.2.0esr/netwerk/base/security-prefs.js	2016-06-20 13:12:21.341155529 +0200
+@@ -22,6 +22,8 @@ pref("security.ssl3.ecdhe_rsa_aes_128_sh
+ pref("security.ssl3.ecdhe_ecdsa_aes_128_sha", true);
+ pref("security.ssl3.ecdhe_rsa_aes_256_sha", true);
+ pref("security.ssl3.ecdhe_ecdsa_aes_256_sha", true);
++pref("security.ssl3.ecdhe_ecdsa_aes_256_gcm_sha384", true);
++pref("security.ssl3.ecdhe_rsa_aes_256_gcm_sha384", true);
+ pref("security.ssl3.dhe_rsa_aes_128_sha", true);
+ pref("security.ssl3.dhe_rsa_aes_256_sha", true);
+ pref("security.ssl3.ecdhe_rsa_rc4_128_sha", true);
+diff -up firefox-45.2.0esr/security/manager/ssl/nsNSSCallbacks.cpp.mozbz-975832 firefox-45.2.0esr/security/manager/ssl/nsNSSCallbacks.cpp
+--- firefox-45.2.0esr/security/manager/ssl/nsNSSCallbacks.cpp.mozbz-975832	2016-06-20 13:09:46.101405014 +0200
++++ firefox-45.2.0esr/security/manager/ssl/nsNSSCallbacks.cpp	2016-06-20 13:14:58.491915282 +0200
+@@ -1076,6 +1076,8 @@ AccumulateCipherSuite(Telemetry::ID prob
+     case TLS_ECDHE_RSA_WITH_RC4_128_SHA: value = 8; break;
+     case TLS_ECDHE_ECDSA_WITH_RC4_128_SHA: value = 9; break;
+     case TLS_ECDHE_ECDSA_WITH_3DES_EDE_CBC_SHA: value = 10; break;
++    case TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384: value = 13; break;
++    case TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384: value = 14; break;
+     // DHE key exchange
+     case TLS_DHE_RSA_WITH_AES_128_CBC_SHA: value = 21; break;
+     case TLS_DHE_RSA_WITH_CAMELLIA_128_CBC_SHA: value = 22; break;
+diff -up firefox-45.2.0esr/security/manager/ssl/nsNSSComponent.cpp.mozbz-975832 firefox-45.2.0esr/security/manager/ssl/nsNSSComponent.cpp
+--- firefox-45.2.0esr/security/manager/ssl/nsNSSComponent.cpp.mozbz-975832	2016-06-20 13:09:46.101405014 +0200
++++ firefox-45.2.0esr/security/manager/ssl/nsNSSComponent.cpp	2016-06-20 13:13:19.814438221 +0200
+@@ -629,6 +629,11 @@ static const CipherPref sCipherPrefs[] =
+  { "security.ssl3.ecdhe_ecdsa_aes_256_sha",
+    TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA, true },
+ 
++ { "security.ssl3.ecdhe_ecdsa_aes_256_gcm_sha384",
++   TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384, true },
++ { "security.ssl3.ecdhe_rsa_aes_256_gcm_sha384",
++   TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384, true },
++
+  { "security.ssl3.dhe_rsa_aes_128_sha",
+    TLS_DHE_RSA_WITH_AES_128_CBC_SHA, true },
+ 
