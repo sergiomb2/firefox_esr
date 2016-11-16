@@ -88,7 +88,7 @@ ExcludeArch: ppc ia64
 
 Summary:        Mozilla Firefox Web browser
 Name:           firefox
-Version:        45.4.0
+Version:        45.5.0
 Release:        1%{?dist}
 URL:            http://www.mozilla.org/projects/firefox/
 License:        MPLv1.1 or GPLv2+ or LGPLv2+
@@ -100,10 +100,10 @@ Group:          Applications/Internet
 # From ftp://archive.mozilla.org/pub/firefox/releases/%{version}%{?ext_version}/source
 Source0:        firefox-%{version}%{?ext_version}.source.tar.xz
 %if %{build_langpacks}
-Source1:        firefox-langpacks-%{version}%{?ext_version}-20160907.tar.xz
+Source1:        firefox-langpacks-%{version}%{?ext_version}-20161108.tar.xz
 %endif
 Source10:       firefox-mozconfig
-Source12:       firefox-centos-default-prefs.js
+Source12:       firefox-redhat-default-prefs.js
 Source20:       firefox.desktop
 Source500:      firefox.sh.in.rhel5
 Source600:      firefox.sh.in.rhel6
@@ -116,7 +116,7 @@ Source300:      gcc48-%{gcc_version}.el5.src.rpm
 Source301:      yasm-1.2.0-3.el5.src.rpm
 Source302:      devtoolset-2-binutils-2.23.52.0.1-10.el5.src.rpm
 # RHEL5 bookmarks
-Source501:       firefox-centos-default-bookmarks.html
+Source501:       firefox-redhat-default-bookmarks.html
 
 # Build patches
 Patch0:         firefox-install-dir.patch
@@ -141,6 +141,7 @@ Patch201:       mozilla-1005535.patch
 # Kaie's patch, we'll most likely need this one
 Patch202:       mozilla-1152515.patch
 Patch203:       mozilla-1270046.patch
+# Laszlo Ersek patch for avoid obscure crashing on aarch64
 
 # RHEL7 patches
 Patch300:       mozilla-975832.patch
@@ -951,8 +952,14 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 #---------------------------------------------------------------------
 
 %changelog
-* Wed Sep 21 2016 CentOS Sources <bugs@centos.org> - 45.4.0-1.el7.centos
-- CentOS default prefs
+* Tue Nov  8 2016 Jan Horak <jhorak@redhat.com> - 45.5.0-1
+- Update to 45.5.0 ESR
+
+* Mon Oct 31 2016 Jan Horak <jhorak@redhat.com> - 45.4.0-3
+- Added upcoming upstream patches mozbz#1018486
+
+* Mon Sep 26 2016 Jan Horak <jhorak@redhat.com> - 45.4.0-2
+- Added Laszlo Ersek patch for aarch64 crashes
 
 * Wed Sep  7 2016 Jan Horak <jhorak@redhat.com> - 45.4.0-1
 - Update to 45.4.0 ESR
