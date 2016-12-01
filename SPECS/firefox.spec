@@ -88,7 +88,7 @@ ExcludeArch: ppc ia64
 
 Summary:        Mozilla Firefox Web browser
 Name:           firefox
-Version:        45.5.0
+Version:        45.5.1
 Release:        1%{?dist}
 URL:            http://www.mozilla.org/projects/firefox/
 License:        MPLv1.1 or GPLv2+ or LGPLv2+
@@ -100,10 +100,10 @@ Group:          Applications/Internet
 # From ftp://archive.mozilla.org/pub/firefox/releases/%{version}%{?ext_version}/source
 Source0:        firefox-%{version}%{?ext_version}.source.tar.xz
 %if %{build_langpacks}
-Source1:        firefox-langpacks-%{version}%{?ext_version}-20161108.tar.xz
+Source1:        firefox-langpacks-%{version}%{?ext_version}-20161130.tar.xz
 %endif
 Source10:       firefox-mozconfig
-Source12:       firefox-centos-default-prefs.js
+Source12:       firefox-redhat-default-prefs.js
 Source20:       firefox.desktop
 Source500:      firefox.sh.in.rhel5
 Source600:      firefox.sh.in.rhel6
@@ -116,7 +116,7 @@ Source300:      gcc48-%{gcc_version}.el5.src.rpm
 Source301:      yasm-1.2.0-3.el5.src.rpm
 Source302:      devtoolset-2-binutils-2.23.52.0.1-10.el5.src.rpm
 # RHEL5 bookmarks
-Source501:       firefox-centos-default-bookmarks.html
+Source501:       firefox-redhat-default-bookmarks.html
 
 # Build patches
 Patch0:         firefox-install-dir.patch
@@ -952,8 +952,8 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 #---------------------------------------------------------------------
 
 %changelog
-* Tue Nov 15 2016 CentOS Sources <bugs@centos.org> - 45.5.0-1.el7.centos
-- CentOS default prefs
+* Wed Nov 30 2016 Jan Horak <jhorak@redhat.com> - 45.5.1-1
+- Update to 45.5.1 ESR
 
 * Tue Nov  8 2016 Jan Horak <jhorak@redhat.com> - 45.5.0-1
 - Update to 45.5.0 ESR
