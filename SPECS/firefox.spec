@@ -36,6 +36,8 @@
 %ifarch s390x
 %define use_bundled_gcc         1
 %endif
+# We don't ship FF on ppc/s390
+ExcludeArch: ppc s390
 %endif
 
 # RHEL6
@@ -46,6 +48,8 @@
 %define system_ffi              0
 %define enable_gstreamer        0
 %define use_bundled_binutils    1
+# We don't ship FF on ppc/s390
+ExcludeArch: ppc s390
 %endif
 
 # RHEL5
@@ -60,7 +64,8 @@
 %define system_gio              0
 %define system_hunspell         0
 # ppc and ia64 no longer supported (rhbz#1214863, rhbz#1214865)
-ExcludeArch: ppc ia64
+# We don't ship FF on s390
+ExcludeArch: ppc ia64 s390
 %define system_libatomic        1
 %endif
 
@@ -87,7 +92,7 @@ ExcludeArch: ppc ia64
 
 Summary:        Mozilla Firefox Web browser
 Name:           firefox
-Version:        45.6.0
+Version:        45.7.0
 Release:        1%{?dist}
 URL:            http://www.mozilla.org/projects/firefox/
 License:        MPLv1.1 or GPLv2+ or LGPLv2+
@@ -99,10 +104,10 @@ Group:          Applications/Internet
 # From ftp://archive.mozilla.org/pub/firefox/releases/%{version}%{?ext_version}/source
 Source0:        firefox-%{version}%{?ext_version}.source.tar.xz
 %if %{build_langpacks}
-Source1:        firefox-langpacks-%{version}%{?ext_version}-20161211.tar.xz
+Source1:        firefox-langpacks-%{version}%{?ext_version}-20170119.tar.xz
 %endif
 Source10:       firefox-mozconfig
-Source12:       firefox-centos-default-prefs.js
+Source12:       firefox-redhat-default-prefs.js
 Source20:       firefox.desktop
 Source500:      firefox.sh.in.rhel5
 Source600:      firefox.sh.in.rhel6
@@ -115,7 +120,7 @@ Source300:      gcc48-%{gcc_version}.el5.src.rpm
 Source301:      yasm-1.2.0-3.el5.src.rpm
 Source302:      devtoolset-2-binutils-2.23.52.0.1-10.el5.src.rpm
 # RHEL5 bookmarks
-Source501:       firefox-centos-default-bookmarks.html
+Source501:       firefox-redhat-default-bookmarks.html
 
 # Build patches
 Patch0:         firefox-install-dir.patch
@@ -525,9 +530,6 @@ function add_to_mozconfig() {
  add_to_mozconfig "disable-debug"
  add_to_mozconfig "enable-optimize"
 %endif
-
-#Disabled due to rhbz#1330898
-add_to_mozconfig "disable-ffmpeg"
 
 #FIXME RTTI?? RHEL5/6
 # ac_add_options --enable-cpp-rtti
@@ -941,18 +943,22 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 %exclude %{_datadir}/idl/*
 %exclude %{_includedir}/*
 %exclude %{_libdir}/%{name}-devel-*/*
-
 %if !%{?system_nss}
 %{mozappdir}/libfreebl3.chk
 %{mozappdir}/libnssdbm3.chk
 %{mozappdir}/libsoftokn3.chk
 %endif
+# Needed for ffmpeg
+%{mozappdir}/gmp-clearkey/*
 
 #---------------------------------------------------------------------
 
 %changelog
-* Wed Dec 14 2016 CentOS Sources <bugs@centos.org> - 45.6.0-1.el7.centos
-- CentOS default prefs
+* Thu Jan 19 2017 Martin Stransky <stransky@redhat.com> - 45.7.0-1
+- Updated to 45.7.0 (B1)
+
+* Wed Jan 11 2017 Martin Stransky <stransky@redhat.com> - 45.6.0-2
+- Enabled ffmpeg > 54.35.1 (rhbz#1330898, mozbz#1263665)
 
 * Sun Dec 11 2016 Jan Horak <jhorak@redhat.com> - 45.6.0-1
 - Update to 45.6.0 ESR
