@@ -1,7 +1,7 @@
 diff -up mozilla-aurora/browser/components/preferences/in-content/advanced.xul.default mozilla-aurora/browser/components/preferences/in-content/advanced.xul
---- mozilla-aurora/browser/components/preferences/in-content/advanced.xul.default	2016-01-28 16:47:37.376005810 +0100
-+++ mozilla-aurora/browser/components/preferences/in-content/advanced.xul	2016-01-28 16:48:40.113963249 +0100
-@@ -63,7 +63,7 @@
+--- mozilla-aurora/browser/components/preferences/in-content/advanced.xul.default	2016-11-15 12:21:37.000000000 +0100
++++ mozilla-aurora/browser/components/preferences/in-content/advanced.xul	2016-12-08 10:51:04.049353573 +0100
+@@ -75,7 +75,7 @@
                type="bool"/>
  
   <!-- Update tab -->
@@ -10,7 +10,7 @@ diff -up mozilla-aurora/browser/components/preferences/in-content/advanced.xul.d
    <preference id="app.update.enabled"
                name="app.update.enabled"
                type="bool"/>
-@@ -107,7 +107,7 @@
+@@ -116,7 +116,7 @@
                type="int"/>
  </preferences>
  
@@ -20,8 +20,8 @@ diff -up mozilla-aurora/browser/components/preferences/in-content/advanced.xul.d
    <stringbundle id="bundleBrand" src="chrome://branding/locale/brand.properties"/>
  #endif
 diff -up mozilla-aurora/browser/components/shell/nsGNOMEShellService.cpp.default mozilla-aurora/browser/components/shell/nsGNOMEShellService.cpp
---- mozilla-aurora/browser/components/shell/nsGNOMEShellService.cpp.default	2015-12-16 16:47:31.000000000 +0100
-+++ mozilla-aurora/browser/components/shell/nsGNOMEShellService.cpp	2016-01-28 16:47:37.376005810 +0100
+--- mozilla-aurora/browser/components/shell/nsGNOMEShellService.cpp.default	2016-11-15 12:21:39.000000000 +0100
++++ mozilla-aurora/browser/components/shell/nsGNOMEShellService.cpp	2016-12-08 10:51:04.049353573 +0100
 @@ -150,8 +150,8 @@ nsGNOMEShellService::GetAppPathFromLaunc
  bool
  nsGNOMEShellService::KeyMatchesAppName(const char *aKeyValue) const
@@ -53,7 +53,7 @@ diff -up mozilla-aurora/browser/components/shell/nsGNOMEShellService.cpp.default
    return matches;
  }
  
-@@ -255,16 +251,7 @@ nsGNOMEShellService::SetDefaultBrowser(b
+@@ -253,16 +249,7 @@ nsGNOMEShellService::SetDefaultBrowser(b
    nsCOMPtr<nsIGConfService> gconf = do_GetService(NS_GCONFSERVICE_CONTRACTID);
    nsCOMPtr<nsIGIOService> giovfs = do_GetService(NS_GIOSERVICE_CONTRACTID);
    if (gconf) {
@@ -72,14 +72,26 @@ diff -up mozilla-aurora/browser/components/shell/nsGNOMEShellService.cpp.default
  
      for (unsigned int i = 0; i < ArrayLength(appProtocols); ++i) {
 diff -up mozilla-aurora/browser/components/shell/nsGNOMEShellService.h.default mozilla-aurora/browser/components/shell/nsGNOMEShellService.h
---- mozilla-aurora/browser/components/shell/nsGNOMEShellService.h.default	2015-12-16 16:47:31.000000000 +0100
-+++ mozilla-aurora/browser/components/shell/nsGNOMEShellService.h	2016-01-28 16:47:37.376005810 +0100
+--- mozilla-aurora/browser/components/shell/nsGNOMEShellService.h.default	2016-12-08 10:51:04.049353573 +0100
++++ mozilla-aurora/browser/components/shell/nsGNOMEShellService.h	2016-12-08 10:55:53.754263671 +0100
 @@ -13,7 +13,7 @@
- class nsGNOMEShellService final : public nsIShellService
+ class nsGNOMEShellService final : public nsIGNOMEShellService
  {
  public:
--  nsGNOMEShellService() : mCheckedThisSession(false), mAppIsInPath(false) { }
-+  nsGNOMEShellService() : mCheckedThisSession(true), mAppIsInPath(true) { }
+-  nsGNOMEShellService() : mAppIsInPath(false) { }
++  nsGNOMEShellService() : mAppIsInPath(true) { }
  
    NS_DECL_ISUPPORTS
    NS_DECL_NSISHELLSERVICE
+diff -up mozilla-aurora/browser/components/shell/ShellService.jsm.default mozilla-aurora/browser/components/shell/ShellService.jsm
+--- mozilla-aurora/browser/components/shell/ShellService.jsm.default	2016-12-08 10:56:51.602245720 +0100
++++ mozilla-aurora/browser/components/shell/ShellService.jsm	2016-12-08 10:56:58.213243668 +0100
+@@ -48,7 +48,7 @@ let ShellServiceInternal = {
+    * up and "browser.shell.checkDefaultBrowser" is true, otherwise it
+    * is false.
+    */
+-  _checkedThisSession: false,
++  _checkedThisSession: true,
+   get shouldCheckDefaultBrowser() {
+     // If we've already checked, the browser has been started and this is a
+     // new window open, and we don't want to check again.

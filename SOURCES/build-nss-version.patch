@@ -1,0 +1,12 @@
+diff -up firefox-52.0esr/old-configure.in.nss-ver firefox-52.0esr/old-configure.in
+--- firefox-52.0esr/old-configure.in.nss-ver	2017-03-01 10:12:54.668047060 +0100
++++ firefox-52.0esr/old-configure.in	2017-03-01 10:13:01.733044933 +0100
+@@ -2123,7 +2123,7 @@ MOZ_ARG_WITH_BOOL(system-nss,
+     _USE_SYSTEM_NSS=1 )
+ 
+ if test -n "$_USE_SYSTEM_NSS"; then
+-    AM_PATH_NSS(3.28.3, [MOZ_SYSTEM_NSS=1], [AC_MSG_ERROR([you don't have NSS installed or your version is too old])])
++    AM_PATH_NSS(3.28.1, [MOZ_SYSTEM_NSS=1], [AC_MSG_ERROR([you don't have NSS installed or your version is too old])])
+ fi
+ 
+ if test -n "$MOZ_SYSTEM_NSS"; then
