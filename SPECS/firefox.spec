@@ -77,7 +77,7 @@
 Summary:        Mozilla Firefox Web browser
 Name:           firefox
 Version:        52.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 URL:            http://www.mozilla.org/projects/firefox/
 License:        MPLv1.1 or GPLv2+ or LGPLv2+
 Group:          Applications/Internet
@@ -126,6 +126,7 @@ Patch111:       rhbz-1173156.patch
 Patch112:       mozilla-256180.patch
 Patch113:       rhbz-1414535.patch
 Patch114:       rhbz-1423012.patch
+Patch115:       mozilla-1348168.patch
 
 # Upstream patches
 # Skia support for big endian platforms, since patch got review- I think we can delete that:
@@ -379,6 +380,7 @@ cd %{tarballdir}
 %patch112 -p1 -b .mozbz-256180
 %patch113 -p1 -b .rhbz-1414535
 %patch114 -p1 -b .rhbz-1423012
+%patch115 -p1 -b .mozbz-1348168
 
 # Upstream patches
 #%patch201 -p1 -b .mozbz-1005535 see Patch201 comment
@@ -880,6 +882,9 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 #---------------------------------------------------------------------
 
 %changelog
+* Fri Mar 17 2017 Martin Stransky <stransky@redhat.com> - 52.0-5
+- Added fix for mozbz#1348168/CVE-2017-5428
+
 * Mon Mar  6 2017 Jan Horak <jhorak@redhat.com> - 52.0-4
 - Update to 52.0 ESR (b4)
 
