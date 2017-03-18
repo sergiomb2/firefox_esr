@@ -91,7 +91,7 @@ Source0:        firefox-%{version}%{?ext_version}.source.tar.xz
 Source1:        firefox-langpacks-%{version}%{?ext_version}-20170306.tar.xz
 %endif
 Source10:       firefox-mozconfig
-Source12:       firefox-redhat-default-prefs.js
+Source12:       firefox-centos-default-prefs.js
 Source20:       firefox.desktop
 Source600:      firefox.sh.in.rhel6
 Source700:      firefox.sh.in.rhel7
@@ -882,6 +882,9 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 #---------------------------------------------------------------------
 
 %changelog
+* Sat Mar 18 2017 Johnny Hughes <johnny@centos.org> - 52.0-5
+- Manual Debranding after Auto Debranding failed.
+
 * Fri Mar 17 2017 Martin Stransky <stransky@redhat.com> - 52.0-5
 - Added fix for mozbz#1348168/CVE-2017-5428
 
