@@ -76,8 +76,8 @@
 
 Summary:        Mozilla Firefox Web browser
 Name:           firefox
-Version:        52.0
-Release:        5%{?dist}
+Version:        52.1.0
+Release:        2%{?dist}
 URL:            http://www.mozilla.org/projects/firefox/
 License:        MPLv1.1 or GPLv2+ or LGPLv2+
 Group:          Applications/Internet
@@ -88,10 +88,10 @@ Group:          Applications/Internet
 # From ftp://archive.mozilla.org/pub/firefox/releases/%{version}%{?ext_version}/source
 Source0:        firefox-%{version}%{?ext_version}.source.tar.xz
 %if %{build_langpacks}
-Source1:        firefox-langpacks-%{version}%{?ext_version}-20170306.tar.xz
+Source1:        firefox-langpacks-%{version}%{?ext_version}-20170419.tar.xz
 %endif
 Source10:       firefox-mozconfig
-Source12:       firefox-centos-default-prefs.js
+Source12:       firefox-redhat-default-prefs.js
 Source20:       firefox.desktop
 Source600:      firefox.sh.in.rhel6
 Source700:      firefox.sh.in.rhel7
@@ -108,7 +108,7 @@ Patch0:         firefox-install-dir.patch
 Patch5:         xulrunner-24.0-jemalloc-ppc.patch
 Patch6:         webrtc-arch-cpu.patch
 Patch8:         firefox-ppc64le.patch
-#ALREADY Patch19:        mozilla-1319374-skia-endian.patch
+Patch9:         build-s390-missing-include.patch
 Patch20:        build-s390-atomic.patch
 Patch21:        build-icu-big-endian.patch
 Patch22:        build-missing-getrandom.patch
@@ -126,18 +126,14 @@ Patch111:       rhbz-1173156.patch
 Patch112:       mozilla-256180.patch
 Patch113:       rhbz-1414535.patch
 Patch114:       rhbz-1423012.patch
-Patch115:       mozilla-1348168.patch
 
 # Upstream patches
-# Skia support for big endian platforms, since patch got review- I think we can delete that:
-#Patch201:       mozilla-1005535.patch
 # Kaie's patch, we'll most likely need this one
 Patch202:       mozilla-1152515.patch
 
 # RHEL7 patches
 
 # RHEL6 patches
-# HOPEFULY fixed Patch401:       build-el6-harfbuzz-old-glib.patch
 
 # ---------------------------------------------------
 BuildRoot:      %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
@@ -364,7 +360,7 @@ cd %{tarballdir}
 %patch5 -p1 -b .jemalloc-ppc.patch
 %patch6 -p1 -b .webrtc-arch-cpu
 %patch8 -p2 -b .ppc64le
-#ALREADY %patch19 -p1 -b .skia-endian
+%patch9 -p1 -b .s390-missing-include
 %patch20 -p1 -b .s390-atomic
 %patch22 -p1 -b .missing-getrandom
 %patch23 -p1 -b .nss-version
@@ -380,19 +376,16 @@ cd %{tarballdir}
 %patch112 -p1 -b .mozbz-256180
 %patch113 -p1 -b .rhbz-1414535
 %patch114 -p1 -b .rhbz-1423012
-%patch115 -p1 -b .mozbz-1348168
 
 # Upstream patches
-#%patch201 -p1 -b .mozbz-1005535 see Patch201 comment
 %patch202 -p1 -b .mozbz-1152515
 
 # RHEL7 only patches
 %if %{?rhel} == 7
 %endif
 
-#%if %{?rhel} == 6
-#HOPEFULY FIXED %patch401 -p1 -b .harfbuzz-old-glib
-#%endif
+%if %{?rhel} == 6
+%endif
 
 # Patch for big endian platforms only
 %if 0%{?big_endian}
@@ -882,8 +875,11 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 #---------------------------------------------------------------------
 
 %changelog
-* Sat Mar 18 2017 Johnny Hughes <johnny@centos.org> - 52.0-5
-- Manual Debranding after Auto Debranding failed.
+* Wed Apr 19 2017 Martin Stransky <stransky@redhat.com> - 52.1.0-2
+- Update to 52.1.0 ESR (Build3)
+
+* Tue Apr 11 2017 Jan Horak <jhorak@redhat.com> - 52.1.0-1
+- Update to 52.1.0 ESR
 
 * Fri Mar 17 2017 Martin Stransky <stransky@redhat.com> - 52.0-5
 - Added fix for mozbz#1348168/CVE-2017-5428
