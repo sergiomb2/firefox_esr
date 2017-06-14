@@ -1,0 +1,12 @@
+diff -up firefox-52.1.1esr/layout/style/nsCSSPseudoElements.h.old firefox-52.1.1esr/layout/style/nsCSSPseudoElements.h
+--- firefox-52.1.1esr/layout/style/nsCSSPseudoElements.h.old	2017-05-17 11:40:23.609432532 +0200
++++ firefox-52.1.1esr/layout/style/nsCSSPseudoElements.h	2017-05-17 12:11:01.635624205 +0200
+@@ -109,7 +109,7 @@ private:
+ 
+   // Work around https://gcc.gnu.org/bugzilla/show_bug.cgi?id=64037 ,
+   // which is a general gcc bug that we seem to have hit only on Android/x86.
+-#if defined(ANDROID) && defined(__i386__) && defined(__GNUC__) && \
++#if defined(__i386__) && defined(__GNUC__) && \
+     !defined(__clang__)
+ #if (MOZ_GCC_VERSION_AT_LEAST(4,8,0) && MOZ_GCC_VERSION_AT_MOST(4,8,4)) || \
+     (MOZ_GCC_VERSION_AT_LEAST(4,9,0) && MOZ_GCC_VERSION_AT_MOST(4,9,2))

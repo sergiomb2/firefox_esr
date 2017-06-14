@@ -1,6 +1,6 @@
 %define system_nss              1
 %global nspr_version            4.13.1
-%global nss_version             3.28.2
+%global nss_version             3.28.4
 %define system_sqlite           0
 %define sqlite_version          3.8.4.2
 %define system_ffi              1
@@ -76,8 +76,8 @@
 
 Summary:        Mozilla Firefox Web browser
 Name:           firefox
-Version:        52.1.0
-Release:        2%{?dist}
+Version:        52.2.0
+Release:        1%{?dist}
 URL:            http://www.mozilla.org/projects/firefox/
 License:        MPLv1.1 or GPLv2+ or LGPLv2+
 Group:          Applications/Internet
@@ -88,10 +88,10 @@ Group:          Applications/Internet
 # From ftp://archive.mozilla.org/pub/firefox/releases/%{version}%{?ext_version}/source
 Source0:        firefox-%{version}%{?ext_version}.source.tar.xz
 %if %{build_langpacks}
-Source1:        firefox-langpacks-%{version}%{?ext_version}-20170419.tar.xz
+Source1:        firefox-langpacks-%{version}%{?ext_version}-20170608.tar.xz
 %endif
 Source10:       firefox-mozconfig
-Source12:       firefox-centos-default-prefs.js
+Source12:       firefox-redhat-default-prefs.js
 Source20:       firefox.desktop
 Source600:      firefox.sh.in.rhel6
 Source700:      firefox.sh.in.rhel7
@@ -134,6 +134,7 @@ Patch202:       mozilla-1152515.patch
 # RHEL7 patches
 
 # RHEL6 patches
+Patch300:       rhbz-1451055.patch
 
 # ---------------------------------------------------
 BuildRoot:      %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
@@ -385,6 +386,7 @@ cd %{tarballdir}
 %endif
 
 %if %{?rhel} == 6
+%patch300 -p1 -b .rhbz-1451055
 %endif
 
 # Patch for big endian platforms only
@@ -875,8 +877,14 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 #---------------------------------------------------------------------
 
 %changelog
-* Thu Apr 20 2017 Johnny Hughes <johnny@centos.org> - 52.1.0-2
-- Manual Debranding after Auto Debranding failed.
+* Thu Jun  8 2017 Jan Horak <jhorak@redhat.com> - 52.2.0-1
+- Update to 52.2.0 ESR
+
+* Wed May 17 2017 Martin Stransky <stransky@redhat.com> - 52.1.1-2
+- Added fix for rhbz#1451055
+
+* Fri May  5 2017 Jan Horak <jhorak@redhat.com> - 52.1.1-1
+- Update to 52.1.1 ESR
 
 * Wed Apr 19 2017 Martin Stransky <stransky@redhat.com> - 52.1.0-2
 - Update to 52.1.0 ESR (Build3)
