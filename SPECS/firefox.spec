@@ -77,7 +77,7 @@
 Summary:        Mozilla Firefox Web browser
 Name:           firefox
 Version:        52.2.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 URL:            http://www.mozilla.org/projects/firefox/
 License:        MPLv1.1 or GPLv2+ or LGPLv2+
 Group:          Applications/Internet
@@ -88,10 +88,10 @@ Group:          Applications/Internet
 # From ftp://archive.mozilla.org/pub/firefox/releases/%{version}%{?ext_version}/source
 Source0:        firefox-%{version}%{?ext_version}.source.tar.xz
 %if %{build_langpacks}
-Source1:        firefox-langpacks-%{version}%{?ext_version}-20170608.tar.xz
+Source1:        firefox-langpacks-%{version}%{?ext_version}-20170613.tar.xz
 %endif
 Source10:       firefox-mozconfig
-Source12:       firefox-centos-default-prefs.js
+Source12:       firefox-redhat-default-prefs.js
 Source20:       firefox.desktop
 Source600:      firefox.sh.in.rhel6
 Source700:      firefox.sh.in.rhel7
@@ -108,12 +108,13 @@ Patch0:         firefox-install-dir.patch
 Patch5:         xulrunner-24.0-jemalloc-ppc.patch
 Patch6:         webrtc-arch-cpu.patch
 Patch8:         firefox-ppc64le.patch
-Patch9:         build-s390-missing-include.patch
+#ALREADY Patch19:        mozilla-1319374-skia-endian.patch
 Patch20:        build-s390-atomic.patch
 Patch21:        build-icu-big-endian.patch
 Patch22:        build-missing-getrandom.patch
 Patch23:        build-nss-version.patch
 Patch24:        build-nss-prbool.patch
+Patch25:        build-s390-missing-include.patch
 
 # RHEL patches
 Patch101:       firefox-default.patch
@@ -124,17 +125,20 @@ Patch106:       firefox-enable-plugins.patch
 Patch110:       mozilla-1170092-etc-conf.patch
 Patch111:       rhbz-1173156.patch
 Patch112:       mozilla-256180.patch
-Patch113:       rhbz-1414535.patch
 Patch114:       rhbz-1423012.patch
+Patch116:       mozilla-1005640-accept-lang.patch
 
 # Upstream patches
+# Skia support for big endian platforms, since patch got review- I think we can delete that:
+#Patch201:       mozilla-1005535.patch
 # Kaie's patch, we'll most likely need this one
 Patch202:       mozilla-1152515.patch
+Patch203:       mozilla-1324096.patch
 
 # RHEL7 patches
 
 # RHEL6 patches
-Patch300:       rhbz-1451055.patch
+# HOPEFULY fixed Patch401:       build-el6-harfbuzz-old-glib.patch
 
 # ---------------------------------------------------
 BuildRoot:      %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
@@ -202,6 +206,7 @@ BuildRequires:  system-bookmarks
 Requires:       mozilla-filesystem
 Requires:       liberation-fonts-common
 Requires:       liberation-sans-fonts
+BuildRequires:  dbus-glib-devel >= 0.60 
 %endif
 
 # RHEL6 requires
@@ -361,11 +366,12 @@ cd %{tarballdir}
 %patch5 -p1 -b .jemalloc-ppc.patch
 %patch6 -p1 -b .webrtc-arch-cpu
 %patch8 -p2 -b .ppc64le
-%patch9 -p1 -b .s390-missing-include
+#ALREADY %patch19 -p1 -b .skia-endian
 %patch20 -p1 -b .s390-atomic
 %patch22 -p1 -b .missing-getrandom
 %patch23 -p1 -b .nss-version
 %patch24 -p1 -b .nss-prbool
+%patch25 -p1 -b .s390-missing-include
 
 # RPM specific patches
 %patch101 -p1 -b .default
@@ -375,19 +381,21 @@ cd %{tarballdir}
 %patch110 -p1 -b .moz-1170092-etc-conf
 %patch111 -p2 -b .rhbz-1173156
 %patch112 -p1 -b .mozbz-256180
-%patch113 -p1 -b .rhbz-1414535
 %patch114 -p1 -b .rhbz-1423012
+%patch116 -p1 -b .mozbz-1005640-accept-lang
 
 # Upstream patches
+#%patch201 -p1 -b .mozbz-1005535 see Patch201 comment
 %patch202 -p1 -b .mozbz-1152515
+%patch203 -p1 -b .mozbz-1324096
 
 # RHEL7 only patches
 %if %{?rhel} == 7
 %endif
 
-%if %{?rhel} == 6
-%patch300 -p1 -b .rhbz-1451055
-%endif
+#%if %{?rhel} == 6
+#HOPEFULY FIXED %patch401 -p1 -b .harfbuzz-old-glib
+#%endif
 
 # Patch for big endian platforms only
 %if 0%{?big_endian}
@@ -877,23 +885,18 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 #---------------------------------------------------------------------
 
 %changelog
-* Wed Jun 14 2017 Johnny Hughes <johnny@centos.org> - 52.2.0-1
-- Manual Debranding after Auto Debranding failed.
-
-* Thu Jun  8 2017 Jan Horak <jhorak@redhat.com> - 52.2.0-1
+* Tue Jun 13 2017 Jan Horak <jhorak@redhat.com> - 52.2.0-1
 - Update to 52.2.0 ESR
 
-* Wed May 17 2017 Martin Stransky <stransky@redhat.com> - 52.1.1-2
-- Added fix for rhbz#1451055
+* Wed May 24 2017 Jan Horak <jhorak@redhat.com> - 52.1.2-1
+- Update to 52.1.2 ESR
 
-* Fri May  5 2017 Jan Horak <jhorak@redhat.com> - 52.1.1-1
-- Update to 52.1.1 ESR
+* Wed May 24 2017 Jan Horak <jhorak@redhat.com> - 52.0-7
+- Added fix for accept language (rhbz#1454322)
 
-* Wed Apr 19 2017 Martin Stransky <stransky@redhat.com> - 52.1.0-2
-- Update to 52.1.0 ESR (Build3)
-
-* Tue Apr 11 2017 Jan Horak <jhorak@redhat.com> - 52.1.0-1
-- Update to 52.1.0 ESR
+* Wed Mar 22 2017 Jan Horak <jhorak@redhat.com> - 52.0-6
+- Removing patch required for older NSS from RHEL 7.3
+- Added patch for rhbz#1414564
 
 * Fri Mar 17 2017 Martin Stransky <stransky@redhat.com> - 52.0-5
 - Added fix for mozbz#1348168/CVE-2017-5428
