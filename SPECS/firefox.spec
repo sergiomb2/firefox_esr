@@ -76,7 +76,7 @@
 
 Summary:        Mozilla Firefox Web browser
 Name:           firefox
-Version:        52.2.0
+Version:        52.3.0
 Release:        2%{?dist}
 URL:            http://www.mozilla.org/projects/firefox/
 License:        MPLv1.1 or GPLv2+ or LGPLv2+
@@ -88,10 +88,10 @@ Group:          Applications/Internet
 # From ftp://archive.mozilla.org/pub/firefox/releases/%{version}%{?ext_version}/source
 Source0:        firefox-%{version}%{?ext_version}.source.tar.xz
 %if %{build_langpacks}
-Source1:        firefox-langpacks-%{version}%{?ext_version}-20170613.tar.xz
+Source1:        firefox-langpacks-%{version}%{?ext_version}-20170803.tar.xz
 %endif
 Source10:       firefox-mozconfig
-Source12:       firefox-centos-default-prefs.js
+Source12:       firefox-redhat-default-prefs.js
 Source20:       firefox.desktop
 Source600:      firefox.sh.in.rhel6
 Source700:      firefox.sh.in.rhel7
@@ -885,8 +885,8 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 #---------------------------------------------------------------------
 
 %changelog
-* Tue Aug 01 2017 Johnny Hughes <johnny@centos.org> -  52.2.0-1
-- Manual Debranding after Auto Debranding failed.
+* Thu Aug  3 2017 Jan Horak <jhorak@redhat.com> - 52.3.0-2
+- Update to 52.3.0 ESR (b2)
 
 * Tue Jun 13 2017 Jan Horak <jhorak@redhat.com> - 52.2.0-1
 - Update to 52.2.0 ESR
