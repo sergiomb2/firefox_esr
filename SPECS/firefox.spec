@@ -91,7 +91,7 @@ Source0:        firefox-%{version}%{?ext_version}.source.tar.xz
 Source1:        firefox-langpacks-%{version}%{?ext_version}-20170803.tar.xz
 %endif
 Source10:       firefox-mozconfig
-Source12:       firefox-redhat-default-prefs.js
+Source12:       firefox-redhat-centos-prefs.js
 Source20:       firefox.desktop
 Source600:      firefox.sh.in.rhel6
 Source700:      firefox.sh.in.rhel7
@@ -885,6 +885,9 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 #---------------------------------------------------------------------
 
 %changelog
+* Wed Aug 23 2017 Johnny Hughes <johnny@centos.org> - 52.3.0-2
+- Manual Debranding after Auto Debranding failed.
+
 * Thu Aug  3 2017 Jan Horak <jhorak@redhat.com> - 52.3.0-2
 - Update to 52.3.0 ESR (b2)
 
