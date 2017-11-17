@@ -885,6 +885,9 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 #---------------------------------------------------------------------
 
 %changelog
+* Fri Nov 17 2017 CentOS Sources <bugs@centos.org> - 52.5.0-1.el7.centos
+- Apply debranding changes
+
 * Thu Nov  9 2017 Jan Horak <jhorak@redhat.com> - 52.5.0-1
 - Update to 52.5.0 ESR
 
