@@ -1,0 +1,68 @@
+diff --git a/security/pkix/lib/pkixder.cpp b/security/pkix/lib/pkixder.cpp
+--- a/security/pkix/lib/pkixder.cpp
++++ b/security/pkix/lib/pkixder.cpp
+@@ -466,28 +466,63 @@ TimeChoice(Reader& tagged, uint8_t expec
+   if (rv != Success) {
+     return rv;
+   }
+ 
+   uint8_t b;
+   if (input.Read(b) != Success) {
+     return Result::ERROR_INVALID_DER_TIME;
+   }
+-  if (b != 'Z') {
++
++  unsigned int hourOffset = 0;
++  unsigned int minuteOffset = 0;
++  bool allowOffset = false;
++  bool haveOffset = false;
++  bool offsetIsPositive = false;
++
++  if (getenv("PKIX_ALLOW_CERT_UTCTIME_OFFSET") != 0) {
++    allowOffset = true;
++  }
++
++  if (allowOffset && (b == '+' || b == '-')) {
++    haveOffset = true;
++    rv = ReadTwoDigits(input, 0u, 23u, hourOffset);
++    if (rv != Success) {
++      return rv;
++    }
++    rv = ReadTwoDigits(input, 0u, 59u, minuteOffset);
++    if (rv != Success) {
++      return rv;
++    }
++    if (b == '+') {
++      offsetIsPositive = true;
++    }
++  } else if (b != 'Z') {
+     return Result::ERROR_INVALID_DER_TIME;
+   }
+   if (End(input) != Success) {
+     return Result::ERROR_INVALID_DER_TIME;
+   }
+ 
+   uint64_t totalSeconds = (static_cast<uint64_t>(days) * 24u * 60u * 60u) +
+                           (static_cast<uint64_t>(hours)      * 60u * 60u) +
+                           (static_cast<uint64_t>(minutes)          * 60u) +
+                           seconds;
+ 
++  if (haveOffset) {
++    uint64_t offsetInSeconds =
++                          (static_cast<uint64_t>(hourOffset) * 60u * 60u) +
++                          (static_cast<uint64_t>(minuteOffset)     * 60u);
++    if (offsetIsPositive) {
++      totalSeconds -= offsetInSeconds;
++    } else {
++      totalSeconds += offsetInSeconds;
++    }
++  }
++
+   time = TimeFromElapsedSecondsAD(totalSeconds);
+   return Success;
+ }
+ 
+ Result
+ IntegralBytes(Reader& input, uint8_t tag,
+               IntegralValueRestriction valueRestriction,
+               /*out*/ Input& value,
