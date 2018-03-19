@@ -1,6 +1,6 @@
 SOURCES/Python-2.7.8.tgz
 SOURCES/devtoolset-2-binutils-2.23.52.0.1-10.el5.src.rpm
-SOURCES/firefox-52.7.0esr.source.tar.xz
-SOURCES/firefox-langpacks-52.7.0esr-20180308.tar.xz
+SOURCES/firefox-52.7.2esr.source.tar.xz
+SOURCES/firefox-langpacks-52.7.2esr-20180316.tar.xz
 SOURCES/gcc48-4.8.2-16.el5.src.rpm
 SOURCES/yasm-1.2.0-3.el5.src.rpm
