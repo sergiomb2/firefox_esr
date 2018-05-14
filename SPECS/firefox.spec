@@ -91,7 +91,7 @@ Source0:        firefox-%{version}%{?ext_version}.source.tar.xz
 Source1:        firefox-langpacks-%{version}%{?ext_version}-20180509.tar.xz
 %endif
 Source10:       firefox-mozconfig
-Source12:       firefox-redhat-default-prefs.js
+Source12:       firefox-centos-default-prefs.js
 Source20:       firefox.desktop
 Source600:      firefox.sh.in.rhel6
 Source700:      firefox.sh.in.rhel7
@@ -885,6 +885,9 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 #---------------------------------------------------------------------
 
 %changelog
+* Mon May 14 2018 Johnny Hughes <johnny@centos.org> - 52.8.0-1
+- Manual CentOS Debranding
+
 * Wed May  9 2018 Jan Horak <jhorak@redhat.com> - 52.8.0-1
 - Update to 52.8.0 ESR
 
