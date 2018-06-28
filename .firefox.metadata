@@ -1,6 +1,7 @@
-511960dd78451a06c9df76509635aeec05b2051a SOURCES/Python-2.7.8.tgz
-467bdb846d67c01aed9e521fe0ef280065a50c3c SOURCES/devtoolset-2-binutils-2.23.52.0.1-10.el5.src.rpm
-38571ff21e6f93c24b4fca0dd87196fb53ede504 SOURCES/firefox-52.8.0esr.source.tar.xz
-44444cc6217a7bbd4deedeba9f0a51349b1eb498 SOURCES/firefox-langpacks-52.8.0esr-20180509.tar.xz
-e5ba84786af5d0e0e23b1a9112c76821ef23306c SOURCES/gcc48-4.8.2-16.el5.src.rpm
+18a8f30a0356c751b8d0ea6f76e764cab13ee046 SOURCES/Python-2.7.13.tar.xz
+e7b9c954fdba527404b9b371f25890ec03d6a0ad SOURCES/firefox-60.1.0esr.source.tar.xz
+188ce061988d69a7ffd629a19a3780eb62b6a40a SOURCES/firefox-langpacks-60.1.0esr-20180622.tar.xz
+6724218efbb1f3fa14541cb2f255970b98446a45 SOURCES/firefox-symbolic.svg
+a7a6297b01578ad0f45c966816c46ce3f97e286b SOURCES/gtk3-private-3.22.26-1.el6.src.rpm
+e188ab1a444697bc649e223c28389d82ca94c472 SOURCES/libffi-3.0.13-18.el7_3.src.rpm
 77fd30f7ebc12a629a31c1e252cec06af55a71fe SOURCES/yasm-1.2.0-3.el5.src.rpm
