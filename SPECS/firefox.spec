@@ -1135,7 +1135,7 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 #---------------------------------------------------------------------
 
 %changelog
-* Tue Jul 20 2018 Johnny Hughes <johnny@centos.org> - 60.1.0-4
+* Tue Jul 10 2018 Johnny Hughes <johnny@centos.org> - 60.1.0-4
 - Manual CentOS Branding
 
 * Sun Jun 24 2018 Martin Stransky <stransky@redhat.com> - 60.1.0-4
