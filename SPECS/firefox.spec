@@ -137,7 +137,7 @@ Source0:        https://hg.mozilla.org/releases/mozilla-release/archive/firefox-
 Source1:        firefox-langpacks-%{version}%{?pre_version}-20180622.tar.xz
 %endif
 Source10:       firefox-mozconfig
-Source12:       firefox-redhat-default-prefs.js
+Source12:       firefox-centos-default-prefs.js
 Source20:       firefox.desktop
 Source21:       firefox.sh.in
 Source23:       firefox.1
@@ -1135,6 +1135,9 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 #---------------------------------------------------------------------
 
 %changelog
+* Tue Jul 20 2018 Johnny Hughes <johnny@centos.org> - 60.1.0-4
+- Manual CentOS Branding
+
 * Sun Jun 24 2018 Martin Stransky <stransky@redhat.com> - 60.1.0-4
 - Disabled jemalloc on all second arches
 
