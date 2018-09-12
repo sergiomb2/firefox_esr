@@ -1,6 +1,7 @@
 # Use system nspr/nss? FIXME
 %global system_nss        1
 %define use_bundled_ffi   0
+%define use_bundled_python 1
 
 # Don't use system hunspell for now
 %global system_hunspell   0
@@ -15,6 +16,10 @@
 %global use_dts           1
 %endif
 
+%if 0%{?rhel} == 7
+%define use_bundled_python 0
+%endif
+
 %global use_rustts        1
 %global dts_version       7
 %global rst_version       7
@@ -26,11 +31,7 @@
 %global system_libvpx     0
 
 # Use system libicu?
-%if 0%{?fedora} > 27
 %global system_libicu     0
-%else
-%global system_libicu     0
-%endif
 
 # Big endian platforms
 %ifarch ppc64 s390x
@@ -121,8 +122,8 @@
 
 Summary:        Mozilla Firefox Web browser
 Name:           firefox
-Version:        60.1.0
-Release:        4%{?pre_tag}%{?dist}
+Version:        60.2.0
+Release:        1%{?pre_tag}%{?dist}
 URL:            https://www.mozilla.org/firefox/
 License:        MPLv1.1 or GPLv2+ or LGPLv2+
 %if 0%{?rhel} == 7
@@ -134,10 +135,10 @@ ExclusiveArch:  i686 x86_64 ppc64 s390x
 
 Source0:        https://hg.mozilla.org/releases/mozilla-release/archive/firefox-%{version}%{?pre_version}.source.tar.xz
 %if %{build_langpacks}
-Source1:        firefox-langpacks-%{version}%{?pre_version}-20180622.tar.xz
+Source1:        firefox-langpacks-%{version}%{?pre_version}-20180831.tar.xz
 %endif
 Source10:       firefox-mozconfig
-Source12:       firefox-centos-default-prefs.js
+Source12:       firefox-redhat-default-prefs.js
 Source20:       firefox.desktop
 Source21:       firefox.sh.in
 Source23:       firefox.1
@@ -177,7 +178,6 @@ Patch44:        firefox-disable-dbus-remote.patch
 # Fedora/RHEL specific patches
 Patch215:        firefox-enable-addons.patch
 Patch219:        rhbz-1173156.patch
-Patch221:        firefox-fedora-ua.patch
 Patch224:        mozilla-1170092.patch
 Patch225:        mozilla-1005640-accept-lang.patch
 #ARM run-time patch
@@ -252,9 +252,11 @@ BuildRequires:  rust-toolset-%{rst_version}-rust
 BuildRequires:  llvm-toolset-%{dts_version}
 BuildRequires:  llvm-toolset-%{dts_version}-llvm-devel
 %endif
-%if 0%{?rhel} == 6
+%if 0%{?use_bundled_python}
+#%if 0%{?rhel} == 6
 # Needed for Python in RHEL6
 BuildRequires:  openssl-devel
+#%endif
 %endif
 
 %if 0%{?bundle_gtk3}
@@ -290,6 +292,13 @@ BuildRequires:        mesa-libEGL-devel
 BuildRequires:        pixman-devel
 BuildRequires:        rest-devel
 BuildRequires:        readline-devel
+# TODO: We miss that dependency in our bundled gtk3 package.
+# As a hotfix we put it here and fix gtk3 in next release.
+Requires:             mesa-libEGL%{?_isa}
+Requires:             libcroco%{?_isa}
+Requires:             mesa-libGL%{?_isa}
+Requires:             bzip2-libs%{?_isa}
+Requires:             libXtst%{?_isa}
 %else
 BuildRequires:        gtk3-devel
 BuildRequires:        glib2-devel
@@ -301,14 +310,9 @@ Requires:       p11-kit-trust
 Requires:       nspr >= %{nspr_build_version}
 Requires:       nss >= %{nss_build_version}
 %endif
-BuildRequires:  python2-devel
 
-%if 0%{?fedora} > 25
-# For early testing of rhbz#1400293 mozbz#1324096 on F26 and Rawhide,
-# temporarily require the specific NSS build with the backports.
-# Can be removed after firefox is changed to require NSS 3.30.
-BuildRequires:  nss-devel >= 3.29.1-2.1
-Requires:       nss >= 3.29.1-2.1
+%if 0%{?rhel} < 8
+BuildRequires:  python2-devel
 %endif
 
 BuildRequires:  desktop-file-utils
@@ -393,7 +397,6 @@ This package contains results of tests executed during build.
 # Fedora patches
 %patch215 -p1 -b .addons
 %patch219 -p2 -b .rhbz-1173156
-%patch221 -p2 -b .fedora-ua
 %patch224 -p1 -b .1170092
 %patch225 -p1 -b .1005640-accept-lang
 
@@ -468,11 +471,8 @@ echo "ac_add_options --enable-debug" >> .mozconfig
 echo "ac_add_options --disable-optimize" >> .mozconfig
 %else
 %global optimize_flags "none"
-# Fedora 26 (gcc7) needs to disable default build flags (mozbz#1342344)
-%if 0%{?fedora} > 25
 %ifnarch s390 s390x
 %global optimize_flags "-g -O2"
-%endif
 %endif
 %ifarch armv7hl
 # ARMv7 need that (rhbz#1426850)
@@ -631,15 +631,16 @@ function build_bundled_package() {
 %endif
 
 # If needed build the bundled python 2.7 and put it in the PATH
-if [ $(python --version 2>&1 | awk '{ print substr ($2, 0, 3) }') = "2.6" ]; then
+%if 0%{?use_bundled_python}
     pushd %{_builddir}/python/Python-%{bundled_python_version}
     #if ! 0%{?avoid_bundled_rebuild}
         # Build Python 2.7 and set environment
-        ./configure --prefix="%{_buildrootdir}" --exec-prefix="%{_buildrootdir}" --libdir="%{_buildrootdir}/lib"
+        # Pydebug set optimization to level 0, -O3 crashes on gcc 8 ATM
+        ./configure --with-pydebug --prefix="%{_buildrootdir}" --exec-prefix="%{_buildrootdir}" --libdir="%{_buildrootdir}/lib"
     #endif
     make %{?_smp_mflags} install V=1
     popd
-fi
+%endif
 
 %if 0%{?bundle_gtk3}
 # gtk3-private-3.22.26.el6-1-requires-provides-filter.inc
@@ -856,6 +857,12 @@ desktop-file-install --dir %{buildroot}%{_datadir}/applications %{SOURCE20}
 # set up the firefox start script
 %{__rm} -rf %{buildroot}%{_bindir}/firefox
 %{__cat} %{SOURCE21} > %{buildroot}%{_bindir}/firefox
+%if 0%{?bundle_gtk3}
+sed -i -e 's|%RHEL_ENV_VARS%|export XDG_DATA_DIRS="$MOZ_LIB_DIR/firefox/bundled/share:/usr/share:$XDG_DATA_DIRS"|' %{buildroot}%{_bindir}/firefox
+%else
+sed -i -e 's|%RHEL_ENV_VARS%||' %{buildroot}%{_bindir}/firefox
+%endif
+
 %{__chmod} 755 %{buildroot}%{_bindir}/firefox
 
 %{__install} -p -D -m 644 %{SOURCE23} %{buildroot}%{_mandir}/man1/firefox.1
@@ -1135,8 +1142,26 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 #---------------------------------------------------------------------
 
 %changelog
-* Tue Jul 10 2018 Johnny Hughes <johnny@centos.org> - 60.1.0-4
-- Manual CentOS Branding
+* Fri Aug 31 2018 Jan Horak <jhorak@redhat.com> - 60.2.0-1
+- Update to 60.2.0 ESR
+
+* Tue Aug 28 2018 Jan Horak <jhorak@redhat.com> - 60.1.0-9
+- Do not set user agent (rhbz#1608065)
+- GTK dialogs are localized now (rhbz#1619373)
+- JNLP association works again (rhbz#1607457)
+
+* Thu Aug 16 2018 Jan Horak <jhorak@redhat.com> - 60.1.0-8
+- Fixed homepage and bookmarks (rhbz#1606778)
+- Fixed missing file associations in RHEL6 (rhbz#1613565)
+
+* Thu Jul 12 2018 Jan Horak <jhorak@redhat.com> - 60.1.0-7
+- Run at-spi-bus if not running already (for the bundled gtk3)
+
+* Mon Jul  9 2018 Jan Horak <jhorak@redhat.com> - 60.1.0-6
+- Fix for missing schemes for bundled gtk3
+
+* Mon Jun 25 2018 Martin Stransky <stransky@redhat.com> - 60.1.0-5
+- Added mesa-libEGL dependency to gtk3/rhel6
 
 * Sun Jun 24 2018 Martin Stransky <stransky@redhat.com> - 60.1.0-4
 - Disabled jemalloc on all second arches
@@ -1242,4 +1267,3 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 
 * Thu Dec  8 2016 Jan Horak <jhorak@redhat.com> - 52.0-0.5
 - Firefox Aurora 52 testing build
-

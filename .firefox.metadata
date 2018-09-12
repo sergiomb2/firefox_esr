@@ -1,7 +1,7 @@
 18a8f30a0356c751b8d0ea6f76e764cab13ee046 SOURCES/Python-2.7.13.tar.xz
-e7b9c954fdba527404b9b371f25890ec03d6a0ad SOURCES/firefox-60.1.0esr.source.tar.xz
-188ce061988d69a7ffd629a19a3780eb62b6a40a SOURCES/firefox-langpacks-60.1.0esr-20180622.tar.xz
+ace3cfe04d1a44677850c388f7dbb17ec19cae24 SOURCES/firefox-60.2.0esr.source.tar.xz
+cec872816b104c904a81415b25bec7ed1dc70fde SOURCES/firefox-langpacks-60.2.0esr-20180831.tar.xz
 6724218efbb1f3fa14541cb2f255970b98446a45 SOURCES/firefox-symbolic.svg
-a7a6297b01578ad0f45c966816c46ce3f97e286b SOURCES/gtk3-private-3.22.26-1.el6.src.rpm
+0de63f863b158454b9429234b52ed28a397ec45c SOURCES/gtk3-private-3.22.26-1.el6.src.rpm
 e188ab1a444697bc649e223c28389d82ca94c472 SOURCES/libffi-3.0.13-18.el7_3.src.rpm
 77fd30f7ebc12a629a31c1e252cec06af55a71fe SOURCES/yasm-1.2.0-3.el5.src.rpm
