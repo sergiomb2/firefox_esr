@@ -1,6 +1,6 @@
 SOURCES/Python-2.7.13.tar.xz
-SOURCES/firefox-60.2.0esr.source.tar.xz
-SOURCES/firefox-langpacks-60.2.0esr-20180831.tar.xz
+SOURCES/firefox-60.2.1esr.source.tar.xz
+SOURCES/firefox-langpacks-60.2.1esr-20180924.tar.xz
 SOURCES/firefox-symbolic.svg
 SOURCES/gtk3-private-3.22.26-1.el6.src.rpm
 SOURCES/libffi-3.0.13-18.el7_3.src.rpm
