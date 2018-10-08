@@ -122,7 +122,7 @@
 
 Summary:        Mozilla Firefox Web browser
 Name:           firefox
-Version:        60.2.1
+Version:        60.2.2
 Release:        1%{?pre_tag}%{?dist}
 URL:            https://www.mozilla.org/firefox/
 License:        MPLv1.1 or GPLv2+ or LGPLv2+
@@ -135,10 +135,10 @@ ExclusiveArch:  i686 x86_64 ppc64 s390x
 
 Source0:        https://hg.mozilla.org/releases/mozilla-release/archive/firefox-%{version}%{?pre_version}.source.tar.xz
 %if %{build_langpacks}
-Source1:        firefox-langpacks-%{version}%{?pre_version}-20180924.tar.xz
+Source1:        firefox-langpacks-%{version}%{?pre_version}-20181002.tar.xz
 %endif
 Source10:       firefox-mozconfig
-Source12:       firefox-centos-default-prefs.js
+Source12:       firefox-redhat-default-prefs.js
 Source20:       firefox.desktop
 Source21:       firefox.sh.in
 Source23:       firefox.1
@@ -189,7 +189,7 @@ Patch402:        mozilla-1196777.patch
 Patch406:        mozilla-256180.patch
 Patch413:        mozilla-1353817.patch
 Patch415:        mozilla-1436242.patch
-Patch1000:       Bug-1238661---fix-mozillaSignalTrampoline-to-work-.patch
+
 # Debian patches
 
 %if %{?system_nss}
@@ -415,10 +415,6 @@ This package contains results of tests executed during build.
 %patch406 -p1 -b .256180
 %patch413 -p1 -b .1353817
 %patch415 -p1 -b .1436242
-
-%ifarch %{arm}
-%patch1000 -p1 -b .mozilla-1238661
-%endif
 
 # Patch for big endian platforms only
 %if 0%{?big_endian}
@@ -1146,8 +1142,8 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 #---------------------------------------------------------------------
 
 %changelog
-* Fri Sep 28 2018 Johnny Hughes <johnny@centos.org> - 60.2.1-1
-- Manual CentOS Debranding
+* Tue Oct  2 2018 Jan Horak <jhorak@redhat.com> - 60.2.2-1
+- Update to 60.2.2 ESR
 
 * Mon Sep 24 2018 Jan Horak <jhorak@redhat.com> - 60.2.1-1
 - Update to 60.2.1 ESR
