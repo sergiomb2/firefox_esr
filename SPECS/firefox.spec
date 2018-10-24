@@ -23,6 +23,11 @@
 %global use_rustts        1
 %global dts_version       7
 %global rst_version       7
+%global llvm_version      7
+%if 0%{?rhel} == 8
+%global rst_version       1.26
+%global llvm_version      6.0
+%endif
 
 # Use system cairo?
 %global system_cairo      0
@@ -122,7 +127,7 @@
 
 Summary:        Mozilla Firefox Web browser
 Name:           firefox
-Version:        60.2.2
+Version:        60.3.0
 Release:        1%{?pre_tag}%{?dist}
 URL:            https://www.mozilla.org/firefox/
 License:        MPLv1.1 or GPLv2+ or LGPLv2+
@@ -135,7 +140,7 @@ ExclusiveArch:  i686 x86_64 ppc64 s390x
 
 Source0:        https://hg.mozilla.org/releases/mozilla-release/archive/firefox-%{version}%{?pre_version}.source.tar.xz
 %if %{build_langpacks}
-Source1:        firefox-langpacks-%{version}%{?pre_version}-20181002.tar.xz
+Source1:        firefox-langpacks-%{version}%{?pre_version}-20181019.tar.xz
 %endif
 Source10:       firefox-mozconfig
 Source12:       firefox-redhat-default-prefs.js
@@ -189,6 +194,8 @@ Patch402:        mozilla-1196777.patch
 Patch406:        mozilla-256180.patch
 Patch413:        mozilla-1353817.patch
 Patch415:        mozilla-1436242.patch
+# Removing this patch could lead to deletion of passwords from user profile!
+Patch416:        mozilla-1475775-key3-revert.patch
 
 # Debian patches
 
@@ -239,18 +246,18 @@ BuildRequires:  devtoolset-%{dts_version}-gcc-c++
 BuildRequires:  devtoolset-%{dts_version}-gcc
 BuildRequires:  devtoolset-%{dts_version}-binutils
 BuildRequires:  devtoolset-%{dts_version}-libatomic-devel
-%if 0%{?rhel} > 6
-BuildRequires:  llvm-toolset-%{dts_version}
-BuildRequires:  llvm-toolset-%{dts_version}-llvm-devel
+%if 0%{?rhel} == 7
+BuildRequires:  llvm-toolset-%{llvm_version}
+BuildRequires:  llvm-toolset-%{llvm_version}-llvm-devel
 %endif
 %endif
 %if 0%{?use_rustts}
 BuildRequires:  rust-toolset-%{rst_version}-cargo
-BuildRequires:  rust-toolset-%{rst_version}-rust
+BuildRequires:  rust-toolset-%{rst_version}-rust >= 1.24
 %endif
 %if 0%{?rhel} == 8
-BuildRequires:  llvm-toolset-%{dts_version}
-BuildRequires:  llvm-toolset-%{dts_version}-llvm-devel
+BuildRequires:  llvm-toolset-%{llvm_version}
+BuildRequires:  llvm-toolset-%{llvm_version}-llvm-devel
 %endif
 %if 0%{?use_bundled_python}
 #%if 0%{?rhel} == 6
@@ -404,6 +411,7 @@ This package contains results of tests executed during build.
 # This needs to stay for the future releases
 %if 0%{?rhel} < 8
 %patch230 -p1 -b .1503632-nss
+%patch416 -R -p1 -b .1475775-key3-revert
 %endif
 
 #ARM run-time patch
@@ -415,6 +423,7 @@ This package contains results of tests executed during build.
 %patch406 -p1 -b .256180
 %patch413 -p1 -b .1353817
 %patch415 -p1 -b .1436242
+
 
 # Patch for big endian platforms only
 %if 0%{?big_endian}
@@ -1142,6 +1151,12 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 #---------------------------------------------------------------------
 
 %changelog
+* Fri Oct 19 2018 Jan Horak <jhorak@redhat.com> - 60.3.0-1
+- Update to 60.3.0 ESR
+
+* Wed Oct 10 2018 Jan Horak <jhorak@redhat.com> - 60.2.2-2
+- Added patch for rhbz#1633932
+
 * Tue Oct  2 2018 Jan Horak <jhorak@redhat.com> - 60.2.2-1
 - Update to 60.2.2 ESR
 
