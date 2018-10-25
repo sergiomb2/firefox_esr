@@ -143,7 +143,7 @@ Source0:        https://hg.mozilla.org/releases/mozilla-release/archive/firefox-
 Source1:        firefox-langpacks-%{version}%{?pre_version}-20181019.tar.xz
 %endif
 Source10:       firefox-mozconfig
-Source12:       firefox-redhat-default-prefs.js
+Source12:       firefox-centos-default-prefs.js
 Source20:       firefox.desktop
 Source21:       firefox.sh.in
 Source23:       firefox.1
@@ -197,6 +197,7 @@ Patch415:        mozilla-1436242.patch
 # Removing this patch could lead to deletion of passwords from user profile!
 Patch416:        mozilla-1475775-key3-revert.patch
 
+Patch1000:       Bug-1238661---fix-mozillaSignalTrampoline-to-work-.patch
 # Debian patches
 
 %if %{?system_nss}
@@ -429,6 +430,11 @@ This package contains results of tests executed during build.
 %if 0%{?big_endian}
 %patch26 -p1 -b .icu
 %endif
+
+%ifarch %{arm}
+%patch1000 -p1 -b .mozilla-1238661
+%endif
+
 
 %{__rm} -f .mozconfig
 %{__cp} %{SOURCE10} .mozconfig
@@ -1151,6 +1157,9 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 #---------------------------------------------------------------------
 
 %changelog
+* Thu Oct 25 2018 Johnny Hughes <johnny@centos.org> - 60.3.0-1
+- Roll in CentOS Branding
+
 * Fri Oct 19 2018 Jan Horak <jhorak@redhat.com> - 60.3.0-1
 - Update to 60.3.0 ESR
 
