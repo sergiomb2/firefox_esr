@@ -127,8 +127,8 @@
 
 Summary:        Mozilla Firefox Web browser
 Name:           firefox
-Version:        60.3.0
-Release:        1%{?pre_tag}%{?dist}
+Version:        60.2.2
+Release:        2%{?pre_tag}%{?dist}
 URL:            https://www.mozilla.org/firefox/
 License:        MPLv1.1 or GPLv2+ or LGPLv2+
 %if 0%{?rhel} == 7
@@ -140,7 +140,7 @@ ExclusiveArch:  i686 x86_64 ppc64 s390x
 
 Source0:        https://hg.mozilla.org/releases/mozilla-release/archive/firefox-%{version}%{?pre_version}.source.tar.xz
 %if %{build_langpacks}
-Source1:        firefox-langpacks-%{version}%{?pre_version}-20181019.tar.xz
+Source1:        firefox-langpacks-%{version}%{?pre_version}-20181002.tar.xz
 %endif
 Source10:       firefox-mozconfig
 Source12:       firefox-redhat-default-prefs.js
@@ -253,7 +253,7 @@ BuildRequires:  llvm-toolset-%{llvm_version}-llvm-devel
 %endif
 %if 0%{?use_rustts}
 BuildRequires:  rust-toolset-%{rst_version}-cargo
-BuildRequires:  rust-toolset-%{rst_version}-rust >= 1.24
+BuildRequires:  rust-toolset-%{rst_version}-rust
 %endif
 %if 0%{?rhel} == 8
 BuildRequires:  llvm-toolset-%{llvm_version}
@@ -1151,9 +1151,6 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 #---------------------------------------------------------------------
 
 %changelog
-* Fri Oct 19 2018 Jan Horak <jhorak@redhat.com> - 60.3.0-1
-- Update to 60.3.0 ESR
-
 * Wed Oct 10 2018 Jan Horak <jhorak@redhat.com> - 60.2.2-2
 - Added patch for rhbz#1633932
 
