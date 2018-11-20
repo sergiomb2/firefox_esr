@@ -1,33 +1,10 @@
 # Use system nspr/nss? FIXME
 %global system_nss        1
-%define use_bundled_ffi   0
-%define use_bundled_python 1
 
-# Don't use system hunspell for now
-%global system_hunspell   0
-%global system_sqlite     0
-
-%if 0%{?rhel} > 6
-%global system_ffi        1
-%else
-%global system_ffi        0
-%endif
-%if 0%{?rhel} < 8
-%global use_dts           1
-%endif
-
-%if 0%{?rhel} == 7
-%define use_bundled_python 0
-%endif
+%global system_hunspell   1
+%global system_sqlite     1
 
 %global use_rustts        1
-%global dts_version       7
-%global rst_version       7
-%global llvm_version      7
-%if 0%{?rhel} == 8
-%global rst_version       1.26
-%global llvm_version      6.0
-%endif
 
 # Use system cairo?
 %global system_cairo      0
@@ -86,17 +63,6 @@
 %endif
 
 %define bundled_python_version 2.7.13
-%define use_bundled_yasm        1
-
-# GTK3 bundling
-%define avoid_bundled_rebuild 0
-%if 0%{?rhel} == 6
-%define bundle_gtk3             1
-# In-tree libffi is able to build on following platforms, we have to bundle it for the rest
-%ifnarch x86_64 i686 aarch64
-%define use_bundled_ffi         1
-%endif
-%endif
 
 %define gtk3_nvr 3.22.26-1
 %define gtk3_install_path %{mozappdir}/bundled
@@ -152,18 +118,6 @@ Source25:       firefox-symbolic.svg
 Source26:       distribution.ini
 Source27:       google-api-key
 
-Source200:      gtk3-private-%{gtk3_nvr}.el6.src.rpm
-Source201:      gtk3-private-%{gtk3_nvr}-post.inc
-Source202:      gtk3-private-%{gtk3_nvr}-postun.inc
-Source203:      gtk3-private-%{gtk3_nvr}-posttrans.inc
-Source204:      gtk3-private-%{gtk3_nvr}-files.inc
-Source205:      gtk3-private-%{gtk3_nvr}-setup-flags-env.inc
-Source206:      gtk3-private-%{gtk3_nvr}-requires-provides-filter.inc
-Source301:      yasm-1.2.0-3.el5.src.rpm
-Source303:      libffi-3.0.13-18.el7_3.src.rpm
-
-#Python 2.7
-Source100:      https://www.python.org/ftp/python/%{bundled_python_version}/Python-%{bundled_python_version}.tar.xz
 # Build patches
 Patch3:         mozilla-build-arm.patch
 Patch4:         build-mozconfig-fix.patch
@@ -242,75 +196,25 @@ BuildRequires:  autoconf213
 BuildRequires:  pkgconfig(libpulse)
 BuildRequires:  pkgconfig(gconf-2.0)
 
-%if 0%{?use_dts}
-BuildRequires:  devtoolset-%{dts_version}-gcc-c++
-BuildRequires:  devtoolset-%{dts_version}-gcc
-BuildRequires:  devtoolset-%{dts_version}-binutils
-BuildRequires:  devtoolset-%{dts_version}-libatomic-devel
-%if 0%{?rhel} == 7
-BuildRequires:  llvm-toolset-%{llvm_version}
-BuildRequires:  llvm-toolset-%{llvm_version}-llvm-devel
-%endif
-%endif
+BuildRequires:  gcc-c++
+BuildRequires:  gcc
+BuildRequires:  binutils
+BuildRequires:  libatomic
+BuildRequires:  yasm
+BuildRequires:  llvm
+BuildRequires:  llvm-devel
+BuildRequires:  clang
+BuildRequires:  clang-libs
+BuildRequires:  pipewire-devel
+BuildRequires:  sqlite-devel
+
 %if 0%{?use_rustts}
-BuildRequires:  rust-toolset-%{rst_version}-cargo
-BuildRequires:  rust-toolset-%{rst_version}-rust >= 1.24
-%endif
-%if 0%{?rhel} == 8
-BuildRequires:  llvm-toolset-%{llvm_version}
-BuildRequires:  llvm-toolset-%{llvm_version}-llvm-devel
-%endif
-%if 0%{?use_bundled_python}
-#%if 0%{?rhel} == 6
-# Needed for Python in RHEL6
-BuildRequires:  openssl-devel
-#%endif
+BuildRequires:  cargo
+BuildRequires:  rust >= 1.24
 %endif
 
-%if 0%{?bundle_gtk3}
-BuildRequires:        automake
-BuildRequires:        autoconf
-BuildRequires:        cups-devel
-BuildRequires:        dbus-devel
-BuildRequires:        desktop-file-utils
-BuildRequires:        expat-devel
-BuildRequires:        fontpackages-devel
-BuildRequires:        gamin-devel
-BuildRequires:        gettext-devel
-BuildRequires:        git
-BuildRequires:        intltool
-BuildRequires:        jasper-devel
-BuildRequires:        libepoxy-devel
-BuildRequires:        libcroco-devel
-BuildRequires:        libffi-devel
-BuildRequires:        libpng-devel
-BuildRequires:        libtiff-devel
-BuildRequires:        libtool
-BuildRequires:        libxml2-devel
-BuildRequires:        libX11-devel
-BuildRequires:        libXcomposite-devel
-BuildRequires:        libXcursor-devel
-BuildRequires:        libXinerama-devel
-BuildRequires:        libXevie-devel
-BuildRequires:        libXrandr-devel
-BuildRequires:        libXrender-devel
-BuildRequires:        libXtst-devel
-BuildRequires:        mesa-libGL-devel
-BuildRequires:        mesa-libEGL-devel
-BuildRequires:        pixman-devel
-BuildRequires:        rest-devel
-BuildRequires:        readline-devel
-# TODO: We miss that dependency in our bundled gtk3 package.
-# As a hotfix we put it here and fix gtk3 in next release.
-Requires:             mesa-libEGL%{?_isa}
-Requires:             libcroco%{?_isa}
-Requires:             mesa-libGL%{?_isa}
-Requires:             bzip2-libs%{?_isa}
-Requires:             libXtst%{?_isa}
-%else
-BuildRequires:        gtk3-devel
-BuildRequires:        glib2-devel
-%endif
+BuildRequires:  gtk3-devel
+BuildRequires:  glib2-devel
 
 Requires:       mozilla-filesystem
 Requires:       p11-kit-trust
@@ -336,11 +240,7 @@ Requires:       sqlite >= %{sqlite_build_version}
 BuildRequires:  xorg-x11-server-Xvfb
 %endif
 
-%if %{?system_ffi}
-  %if !%{use_bundled_ffi}0
 BuildRequires:  pkgconfig(libffi)
-  %endif
-%endif
 
 Obsoletes:      mozilla <= 37:1.7.13
 Provides:       webclient
@@ -379,7 +279,6 @@ This package contains results of tests executed during build.
 #---------------------------------------------------------------------
 
 %prep
-%setup -q -T -c -n python -a 100
 %setup -q -n %{tarballdir}
 # Build patches, can't change backup suffix from default because during build
 # there is a compare of config and js/config directories and .orig suffix is
@@ -464,12 +363,7 @@ echo "ac_add_options --enable-system-cairo" >> .mozconfig
 echo "ac_add_options --disable-system-cairo" >> .mozconfig
 %endif
 
-%if 0%{?use_bundled_ffi}
 echo "ac_add_options --enable-system-ffi" >> .mozconfig
-%endif
-%if 0%{?system_ffi}
-echo "ac_add_options --enable-system-ffi" >> .mozconfig
-%endif
 
 %ifarch %{arm}
 echo "ac_add_options --disable-elf-hack" >> .mozconfig
@@ -582,94 +476,6 @@ function install_rpms_to_current_dir() {
      done
 }
 
-function build_bundled_package() {
-  PACKAGE_RPM=$1
-  PACKAGE_FILES=$2
-  PACKAGE_SOURCE=$3
-  PACKAGE_DIR="%{_topdir}/RPMS"
-
-  PACKAGE_ALREADY_BUILD=0
-  %if %{?avoid_bundled_rebuild}
-    if ls $PACKAGE_DIR/$PACKAGE_RPM; then
-      PACKAGE_ALREADY_BUILD=1
-    fi
-    if ls $PACKAGE_DIR/%{_arch}/$PACKAGE_RPM; then
-      PACKAGE_ALREADY_BUILD=1
-    fi
-  %endif
-  if [ $PACKAGE_ALREADY_BUILD == 0 ]; then
-    echo "Rebuilding $PACKAGE_RPM from $PACKAGE_SOURCE"; echo "==============================="
-    rpmbuild --nodeps --rebuild $PACKAGE_SOURCE
-  fi
-
-  if [ ! -f $PACKAGE_DIR/$PACKAGE_RPM ]; then
-    # Hack for tps tests
-    ARCH_STR=%{_arch}
-    %ifarch i386 i686
-    ARCH_STR="i?86"
-    %endif
-    PACKAGE_DIR="$PACKAGE_DIR/$ARCH_STR"
-  fi
-  pushd $PACKAGE_DIR
-  echo "Installing $PACKAGE_DIR/$PACKAGE_RPM"; echo "==============================="
-  rpm2cpio $PACKAGE_DIR/$PACKAGE_RPM | cpio -iduv
-  # Clean rpms to avoid including them to package
-  %if ! 0%{?avoid_bundled_rebuild}
-    rm -f $PACKAGE_FILES
-  %endif
-
-  PATH=$PACKAGE_DIR/usr/bin:$PATH
-  export PATH
-  LD_LIBRARY_PATH=$PACKAGE_DIR/usr/%{_lib}
-  export LD_LIBRARY_PATH
-  popd
-}
-
-# Build and install local yasm if needed
-# ======================================
-%if %{use_bundled_yasm}
-  build_bundled_package 'yasm-1*.rpm' 'yasm-*.rpm' '%{SOURCE301}'
-%endif
-
-
-%if 0%{?bundle_gtk3}
-   %if ! 0%{?avoid_bundled_rebuild}
-    rpm -ivh %{SOURCE200}
-    rpmbuild --nodeps --define '_prefix %{gtk3_install_path}' -ba %{_specdir}/gtk3-private.spec
-   %endif
-   rm -rf %{_buildrootdir}/*
-   pushd %{_buildrootdir}
-   install_rpms_to_current_dir gtk3-private-%{gtk3_nvr}*.rpm
-   install_rpms_to_current_dir gtk3-private-devel-%{gtk3_nvr}*.rpm
-   install_rpms_to_current_dir gtk3-private-rpm-scripts-%{gtk3_nvr}*.rpm
-   popd
-%endif
-
-# If needed build the bundled python 2.7 and put it in the PATH
-%if 0%{?use_bundled_python}
-    pushd %{_builddir}/python/Python-%{bundled_python_version}
-    #if ! 0%{?avoid_bundled_rebuild}
-        # Build Python 2.7 and set environment
-        # Pydebug set optimization to level 0, -O3 crashes on gcc 8 ATM
-        ./configure --with-pydebug --prefix="%{_buildrootdir}" --exec-prefix="%{_buildrootdir}" --libdir="%{_buildrootdir}/lib"
-    #endif
-    make %{?_smp_mflags} install V=1
-    popd
-%endif
-
-%if 0%{?bundle_gtk3}
-# gtk3-private-3.22.26.el6-1-requires-provides-filter.inc
-%include_file %{SOURCE206}
-%endif
-%if 0%{use_bundled_ffi}
-  # Install libraries to the predefined location to later add them to the Firefox libraries
-  rpm -ivh %{SOURCE303}
-  rpmbuild --nodeps --define '_prefix %{gtk3_install_path}' -ba %{_specdir}/libffi.spec
-  pushd %{_buildrootdir}
-  install_rpms_to_current_dir 'libffi*.rpm'
-  popd
-  %filter_from_requires /libffi.so.6/d
-%endif
 %filter_setup
 
 # GTK3 <<
@@ -685,16 +491,6 @@ case "%{sqlite_build_version}" in
 esac
 %endif
 
-# We need to disable exit on error temporarily for the following scripts:
-set +e
-%if 0%{?use_dts}
-source scl_source enable devtoolset-%{dts_version}
-%endif
-%if 0%{?use_rustts}
-source scl_source enable rust-toolset-%{rst_version}
-%endif
-
-set -e
 # Hack for missing shell when building in brew on RHEL6
 %if 0%{?rhel} == 6
 export SHELL=/bin/sh
@@ -846,13 +642,6 @@ pushd %{buildroot}
 install_rpms_to_current_dir gtk3-private-%{gtk3_nvr}*.rpm
 install_rpms_to_current_dir gtk3-private-rpm-scripts-%{gtk3_nvr}*.rpm
 popd
-%endif
-
-# Install bundled libffi
-%if %{use_bundled_ffi}
-  pushd %{buildroot}
-  install_rpms_to_current_dir libffi-3*.rpm
-  popd
 %endif
 
 # set up our default bookmarks
@@ -1135,7 +924,7 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 %{mozappdir}/gmp-clearkey
 %{mozappdir}/fonts/EmojiOneMozilla.ttf
 %if !%{?system_libicu}
-#%{mozappdir}/icudt*.dat
+#{mozappdir}/icudt*.dat
 %endif
 %if !%{?system_nss}
 %{mozappdir}/libfreeblpriv3.chk
@@ -1143,16 +932,6 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 %{mozappdir}/libsoftokn3.chk
 %exclude %{mozappdir}/libnssckbi.so
 %endif
-%if 0%{use_bundled_ffi}
-%{mozappdir}/bundled/%{_lib}/libffi.so*
-%exclude %{_datadir}/doc/libffi*
-%endif
-
-%if 0%{?bundle_gtk3}
-# gtk3-private-files.inc
-%include_file %{SOURCE204}
-%endif
-
 
 #---------------------------------------------------------------------
 
