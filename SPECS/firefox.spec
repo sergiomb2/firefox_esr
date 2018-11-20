@@ -10,10 +10,10 @@
 %global system_cairo      0
 
 # Use system libvpx?
-%global system_libvpx     0
+%global system_libvpx     1
 
 # Use system libicu?
-%global system_libicu     0
+%global system_libicu     1
 
 # Big endian platforms
 %ifarch ppc64 s390x
@@ -94,7 +94,7 @@
 Summary:        Mozilla Firefox Web browser
 Name:           firefox
 Version:        60.3.0
-Release:        1%{?pre_tag}%{?dist}
+Release:        2%{?pre_tag}%{?dist}
 URL:            https://www.mozilla.org/firefox/
 License:        MPLv1.1 or GPLv2+ or LGPLv2+
 %if 0%{?rhel} == 7
@@ -936,6 +936,9 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 #---------------------------------------------------------------------
 
 %changelog
+* Tue Nov 20 2018 Sérgio Basto <sergio@serjux.com> - 60.3.0-2
+- After build icu 60 we may enable system icu
+
 * Thu Oct 25 2018 Johnny Hughes <johnny@centos.org> - 60.3.0-1
 - Roll in CentOS Branding
 
