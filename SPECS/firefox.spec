@@ -252,7 +252,10 @@ BuildRequires:  python2-devel
 
 BuildRequires:  desktop-file-utils
 BuildRequires:  system-bookmarks
+
+%if 0%{?rhel}
 Requires:       redhat-indexhtml
+%endif
 
 %if %{?system_sqlite}
 BuildRequires:  pkgconfig(sqlite3) >= %{sqlite_version}
