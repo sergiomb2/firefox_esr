@@ -5,15 +5,28 @@
 %global system_sqlite     1
 
 %global use_rustts        1
+%global dts_version       7
+%global rst_version       7
+%global llvm_version      7
 
 # Use system cairo?
 %global system_cairo      0
 
 # Use system libvpx?
+%if 0%{?rhel}
+%global system_libvpx     0
+%else
 %global system_libvpx     1
+%endif
 
 # Use system libicu?
+%if 0%{?fedora} > 28
 %global system_libicu     1
+%else
+# libicu < 59.1
+%global system_libicu     0
+%endif
+
 
 # Big endian platforms
 %ifarch ppc64 s390x
@@ -94,7 +107,7 @@
 Summary:        Mozilla Firefox Web browser
 Name:           firefox
 Version:        60.3.0
-Release:        2%{?pre_tag}%{?dist}
+Release:        3%{?pre_tag}%{?dist}
 URL:            https://www.mozilla.org/firefox/
 License:        MPLv1.1 or GPLv2+ or LGPLv2+
 %if 0%{?rhel} == 7
@@ -195,7 +208,18 @@ BuildRequires:  libvpx-devel >= %{libvpx_version}
 BuildRequires:  autoconf213
 BuildRequires:  pkgconfig(libpulse)
 BuildRequires:  pkgconfig(gconf-2.0)
-
+%if 0%{?rhel} == 7
+BuildRequires:  devtoolset-%{dts_version}-gcc-c++
+BuildRequires:  devtoolset-%{dts_version}-gcc
+BuildRequires:  devtoolset-%{dts_version}-binutils
+BuildRequires:  devtoolset-%{dts_version}-libatomic-devel
+BuildRequires:  llvm-toolset-%{llvm_version}
+BuildRequires:  llvm-toolset-%{llvm_version}-llvm-devel
+%if 0%{?use_rustts}
+BuildRequires:  rust-toolset-%{rst_version}-cargo
+BuildRequires:  rust-toolset-%{rst_version}-rust >= 1.24
+%endif
+%else
 BuildRequires:  gcc-c++
 BuildRequires:  gcc
 BuildRequires:  binutils
@@ -207,6 +231,7 @@ BuildRequires:  clang
 BuildRequires:  clang-libs
 BuildRequires:  pipewire-devel
 BuildRequires:  sqlite-devel
+%endif
 
 %if 0%{?use_rustts}
 BuildRequires:  cargo
@@ -223,18 +248,20 @@ Requires:       nspr >= %{nspr_build_version}
 Requires:       nss >= %{nss_build_version}
 %endif
 
-%if 0%{?rhel} < 8
 BuildRequires:  python2-devel
-%endif
 
 BuildRequires:  desktop-file-utils
 BuildRequires:  system-bookmarks
 Requires:       redhat-indexhtml
+
 %if %{?system_sqlite}
 BuildRequires:  pkgconfig(sqlite3) >= %{sqlite_version}
 Requires:       sqlite >= %{sqlite_build_version}
 %endif
 
+%if %{?system_libicu}
+BuildRequires:  pkgconfig(icu-i18n) >= 59.1
+%endif
 
 %if %{?run_tests}
 BuildRequires:  xorg-x11-server-Xvfb
@@ -491,10 +518,16 @@ case "%{sqlite_build_version}" in
 esac
 %endif
 
-# Hack for missing shell when building in brew on RHEL6
-%if 0%{?rhel} == 6
-export SHELL=/bin/sh
+# We need to disable exit on error temporarily for the following scripts:
+set +e
+%if 0%{?rhel} == 7
+source scl_source enable devtoolset-%{dts_version}
+%if 0%{?use_rustts}
+source scl_source enable rust-toolset-%{rst_version}
 %endif
+%endif
+
+set -e
 
 echo "Generate big endian version of config/external/icu/data/icud58l.dat"
 %if 0%{?big_endian}
@@ -936,6 +969,9 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 #---------------------------------------------------------------------
 
 %changelog
+* Tue Nov 20 2018 Sérgio Basto <sergio@serjux.com> - 60.3.0-3
+- Try build it on epel 7 ( without el6 complexity)
+
 * Tue Nov 20 2018 Sérgio Basto <sergio@serjux.com> - 60.3.0-2
 - After build icu 60 we may enable system icu
 
