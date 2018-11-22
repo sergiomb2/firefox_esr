@@ -75,19 +75,6 @@
 %global sqlite_build_version %(pkg-config --silence-errors --modversion sqlite3 2>/dev/null || echo 65536)
 %endif
 
-%define bundled_python_version 2.7.13
-
-%define gtk3_nvr 3.22.26-1
-%define gtk3_install_path %{mozappdir}/bundled
-
-%if 0%{?bundle_gtk3}
-# We could use %%include, but in %%files, %%post and other sections, but in these
-# sections it could lead to syntax errors about unclosed %%if. Work around it by
-# using the following macro
-%define include_file() %{expand:%(cat '%1')}
-%endif
-
-
 %global mozappdir     %{_libdir}/%{name}
 %global mozappdirdev  %{_libdir}/%{name}-devel-%{version}
 %global langpackdir   %{mozappdir}/distribution/extensions
@@ -598,11 +585,6 @@ MOZ_SMP_FLAGS=-j1
 [ "$RPM_BUILD_NCPUS" -ge 8 ] && MOZ_SMP_FLAGS=-j8
 %endif
 
-%if 0%{?bundle_gtk3}
-# gtk3-private-setup-flags-env.inc
-%include_file %{SOURCE205}
-%endif
-
 #make -f client.mk build STRIP="/bin/true" MOZ_MAKE_FLAGS="$MOZ_SMP_FLAGS" MOZ_SERVICES_SYNC="1"
 export MOZ_MAKE_FLAGS="$MOZ_SMP_FLAGS"
 export MOZ_SERVICES_SYNC="1"
@@ -652,34 +634,6 @@ rm -f  objdir/dist/bin/pk12util
 export SHELL=/bin/sh
 %endif
 
-%if 0%{?bundle_gtk3}
-function install_rpms_to_current_dir() {
-    PACKAGE_RPM=$(eval echo $1)
-    PACKAGE_DIR=%{_rpmdir}
-
-    if [ ! -f $PACKAGE_DIR/$PACKAGE_RPM ]; then
-        # Hack for tps tests
-        ARCH_STR=%{_arch}
-        %ifarch i386 i686
-            ARCH_STR="i?86"
-        %endif
-        PACKAGE_DIR="$PACKAGE_DIR/$ARCH_STR"
-     fi
-
-     for package in $(ls $PACKAGE_DIR/$PACKAGE_RPM)
-     do
-         echo "$package"
-         rpm2cpio "$package" | cpio -idu
-     done
-}
-
-pushd %{buildroot}
-# Install gtk3-private again to the buildroot, but without devel subpackage
-install_rpms_to_current_dir gtk3-private-%{gtk3_nvr}*.rpm
-install_rpms_to_current_dir gtk3-private-rpm-scripts-%{gtk3_nvr}*.rpm
-popd
-%endif
-
 # set up our default bookmarks
 %{__cp} -p %{default_bookmarks_file} objdir/dist/bin/browser/chrome/en-US/locale/browser/bookmarks.html
 
@@ -697,11 +651,7 @@ desktop-file-install --dir %{buildroot}%{_datadir}/applications %{SOURCE20}
 # set up the firefox start script
 %{__rm} -rf %{buildroot}%{_bindir}/firefox
 %{__cat} %{SOURCE21} > %{buildroot}%{_bindir}/firefox
-%if 0%{?bundle_gtk3}
-sed -i -e 's|%RHEL_ENV_VARS%|export XDG_DATA_DIRS="$MOZ_LIB_DIR/firefox/bundled/share:/usr/share:$XDG_DATA_DIRS"|' %{buildroot}%{_bindir}/firefox
-%else
 sed -i -e 's|%RHEL_ENV_VARS%||' %{buildroot}%{_bindir}/firefox
-%endif
 
 %{__chmod} 755 %{buildroot}%{_bindir}/firefox
 
@@ -870,19 +820,9 @@ if [ $1 -eq 0 ]; then
   %{__rm} -rf %{langpackdir}
 fi
 
-%clean
-rm -rf %{_srcrpmdir}/gtk3-private-%{gtk3_nvr}*.src.rpm
-find %{_rpmdir} -name "gtk3-private-*%{gtk3_nvr}*.rpm" -delete
-rm -rf %{_srcrpmdir}/libffi*.src.rpm
-find %{_rpmdir} -name "libffi*.rpm" -delete
-
 %post
 update-desktop-database &> /dev/null || :
 touch --no-create %{_datadir}/icons/hicolor &>/dev/null || :
-%if 0%{?bundle_gtk3}
-# gtk3-private-post.inc
-%include_file %{SOURCE201}
-%endif
 
 %postun
 update-desktop-database &> /dev/null || :
@@ -890,17 +830,9 @@ if [ $1 -eq 0 ] ; then
     touch --no-create %{_datadir}/icons/hicolor &>/dev/null
     gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 fi
-%if 0%{?bundle_gtk3}
-# gtk3-private-postun.inc
-%include_file %{SOURCE202}
-%endif
 
 %posttrans
 gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
-%if 0%{?bundle_gtk3}
-# gtk3-private-posttrans.inc
-%include_file %{SOURCE203}
-%endif
 
 %files -f %{name}.lang
 %{_bindir}/firefox
