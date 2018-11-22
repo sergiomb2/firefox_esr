@@ -94,7 +94,7 @@
 Summary:        Mozilla Firefox Web browser
 Name:           firefox
 Version:        60.3.0
-Release:        3%{?pre_tag}%{?dist}
+Release:        4%{?pre_tag}%{?dist}
 URL:            https://www.mozilla.org/firefox/
 License:        MPLv1.1 or GPLv2+ or LGPLv2+
 %if 0%{?rhel} == 7
@@ -109,7 +109,10 @@ Source0:        https://hg.mozilla.org/releases/mozilla-release/archive/firefox-
 Source1:        firefox-langpacks-%{version}%{?pre_version}-20181019.tar.xz
 %endif
 Source10:       firefox-mozconfig
+# https://github.com/Rob--W/enablelegacy-firefox-addons
 Source12:       firefox-centos-default-prefs.js
+Source13:       enablelegacy.cfg
+Source14:       enablelegacy-prefs.js
 Source20:       firefox.desktop
 Source21:       firefox.sh.in
 Source23:       firefox.1
@@ -765,7 +768,9 @@ create_default_langpack "zh-TW" "zh"
 %{__mkdir_p} %{buildroot}%{mozappdir}/browser/defaults
 ln -s %{mozappdir}/defaults/preferences $RPM_BUILD_ROOT/%{mozappdir}/browser/defaults/preferences
 # Default preferences
-%{__cp} %{SOURCE12} %{buildroot}%{mozappdir}/defaults/preferences/all-redhat.js
+%{__cp} %{SOURCE12} %{buildroot}%{mozappdir}/defaults/preferences/
+%{__cp} %{SOURCE13} %{buildroot}%{mozappdir}
+%{__cp} %{SOURCE14} %{buildroot}%{mozappdir}/defaults/preferences/
 
 # System config dir
 %{__mkdir_p} %{buildroot}/%{_sysconfdir}/%{name}/pref
@@ -886,6 +891,7 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 %{mozappdir}/defaults/pref/channel-prefs.js
 %{mozappdir}/dependentlibs.list
 %{mozappdir}/dictionaries
+%{mozappdir}/enablelegacy.cfg
 %{mozappdir}/omni.ja
 %{mozappdir}/platform.ini
 %{mozappdir}/plugin-container
@@ -904,6 +910,9 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 #---------------------------------------------------------------------
 
 %changelog
+* Wed Nov 21 2018 Sérgio Basto <sergio@serjux.com>
+- Enable Legacy add-ons (warning many will not work)
+
 * Tue Nov 20 2018 Sérgio Basto <sergio@serjux.com> - 60.3.0-3
 - Try build it on epel 7 ( without el6 complexity)
 
