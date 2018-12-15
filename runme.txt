@@ -1,0 +1,2 @@
+rpmbuild -bs SPECS/firefox.spec --define '_sourcedir SOURCES' --define '_srcrpmdir SRPMS' && copr-cli build sergiomb/firefox_esr SRPMS/firefox-60.4.0-1.fc28.src.rpm
+
