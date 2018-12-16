@@ -20,7 +20,7 @@
 %endif
 
 # Use system libicu?
-%if 0%{?fedora} > 28
+%if 0%{?fedora} > 27
 %global system_libicu     1
 %else
 # libicu < 59.1
@@ -93,8 +93,8 @@
 
 Summary:        Mozilla Firefox Web browser
 Name:           firefox
-Version:        60.3.0
-Release:        4%{?pre_tag}%{?dist}
+Version:        60.4.0
+Release:        1%{?pre_tag}%{?dist}
 URL:            https://www.mozilla.org/firefox/
 License:        MPLv1.1 or GPLv2+ or LGPLv2+
 %if 0%{?rhel} == 7
@@ -103,12 +103,13 @@ ExcludeArch:    s390 ppc
 %if 0%{?rhel} == 6
 ExclusiveArch:  i686 x86_64 ppc64 s390x
 %endif
+Source0:        https://ftp.mozilla.org/pub/firefox/releases/60.4.0esr/source/firefox-%{version}%{?pre_version}.source.tar.xz
 
-Source0:        https://hg.mozilla.org/releases/mozilla-release/archive/firefox-%{version}%{?pre_version}.source.tar.xz
 %if %{build_langpacks}
-Source1:        firefox-langpacks-%{version}%{?pre_version}-20181019.tar.xz
+Source1:        firefox-langpacks-%{version}%{?pre_version}-20181215.tar.xz
 %endif
 Source10:       firefox-mozconfig
+Source11:       moz-grab-langpacks
 # https://github.com/Rob--W/enablelegacy-firefox-addons
 Source12:       firefox-centos-default-prefs.js
 Source13:       enablelegacy.cfg
@@ -151,8 +152,6 @@ Patch402:        mozilla-1196777.patch
 Patch406:        mozilla-256180.patch
 Patch413:        mozilla-1353817.patch
 Patch415:        mozilla-1436242.patch
-# Removing this patch could lead to deletion of passwords from user profile!
-Patch416:        mozilla-1475775-key3-revert.patch
 
 Patch1000:       Bug-1238661---fix-mozillaSignalTrampoline-to-work-.patch
 # Debian patches
@@ -331,7 +330,6 @@ This package contains results of tests executed during build.
 # This needs to stay for the future releases
 %if 0%{?rhel} < 8
 %patch230 -p1 -b .1503632-nss
-%patch416 -R -p1 -b .1475775-key3-revert
 %endif
 
 #ARM run-time patch
@@ -910,7 +908,12 @@ gtk-update-icon-cache %{_datadir}/icons/hicolor &>/dev/null || :
 #---------------------------------------------------------------------
 
 %changelog
-* Wed Nov 21 2018 Sérgio Basto <sergio@serjux.com>
+* Sun Dec 16 2018 Sérgio Basto <sergio@serjux.com> - 60.4.0-1
+- Update to 60.4.0esr
+- Patch416 applied upstream
+- Add moz-grab-langpacks sources to generate firefox-langpacks
+
+* Wed Nov 21 2018 Sérgio Basto <sergio@serjux.com> - 60.3.0-4
 - Enable Legacy add-ons (warning many will not work)
 
 * Tue Nov 20 2018 Sérgio Basto <sergio@serjux.com> - 60.3.0-3
